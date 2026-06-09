@@ -6,24 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-    Schema::create('pendaftarans', function (Blueprint $table) {
-        $table->id();
-        // Menghubungkan ke tabel users (warga)
-        $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-        // Menghubungkan ke tabel kegiatans (acara kerja bakti)
-        $table->foreignId('kegiatan_id')->constrained('kegiatans')->onDelete('cascade');
-        $table->timestamps();
-});     
+        Schema::create('pendaftarans', function (Blueprint $table) {
+            $table->id();
+            // Menghubungkan ke tabel kegiatans (bukan posts)
+            $table->foreignId('kegiatan_id')->constrained('kegiatans')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->timestamps();
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('pendaftarans');
