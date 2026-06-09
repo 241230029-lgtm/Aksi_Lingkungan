@@ -1,28 +1,29 @@
-# Proyek UAS: Aksi Lingkungan
+# Aplikasi "Aksi Lingkungan"
 
-##  Deskripsi Proyek
-**Aksi Lingkungan** adalah sebuah sistem informasi berbasis web yang dirancang untuk memfasilitasi, mengelola, dan meningkatkan partisipasi masyarakat dalam kegiatan menjaga kebersihan dan kelestarian lingkungan. Aplikasi ini dibangun menggunakan framework Laravel dengan tujuan utama mendokumentasikan kegiatan sosial lingkungan serta mempermudah koordinasi antar warga atau relawan secara digital dan terstruktur.
+Aplikasi **Aksi Lingkungan** adalah platform mading digital terpusat berbasis kecamatan yang dirancang untuk mengatasi kendala koordinasi dan penyebaran informasi gerakan pelestarian lingkungan lokal. Proyek ini dikembangkan menggunakan framework **Laravel** dan **Tailwind CSS** sebagai bagian dari pemenuhan tugas Project-Based Learning (PjBL).
 
-## Anggota Kelompok
-* **Aldo Saputra** - 241230029
-* **Rafli Afdalla Fardin** - 241230051
-* **Iksan Nugraha** - 241230057
-* **Arsa Mulyana** - 241230043
-* **Nawa Astar** - 241230025
-* **⁠M.Nabhan Fadhil** - 231230027
-  
-## Fitur Utama Aplikasi
-Aplikasi ini dilengkapi dengan beberapa fitur utama yang mendukung kolaborasi aksi lingkungan, antara lain:
-1. **Informasi Kerja Bakti**
-   Menyediakan informasi lengkap, jadwal, serta lokasi pelaksanaan kegiatan kerja bakti atau aksi sosial lingkungan yang akan datang.
-2. **Pendaftaran Kegiatan**
-   Memungkinkan warga atau relawan untuk mendaftarkan diri secara langsung ke dalam aksi lingkungan yang ingin mereka ikuti secara online.
-3. **Dokumentasi Aksi**
-   Wadah untuk mengunggah dan menampilkan foto atau laporan hasil kegiatan yang telah selesai dilaksanakan sebagai bentuk transparansi dan publikasi.
-4. **Riwayat Partisipasi**
-   Menampilkan catatan atau histori kegiatan apa saja yang pernah diikuti oleh pengguna selama bergabung dalam platform Aksi Lingkungan.
+---
 
-## Teknologi yang Digunakan
-* **Framework:** Laravel (PHP)
-* **Database:** MySQL
-* **Version Control:** Git & GitHub
+## 3 Fitur Utama (Core Features)
+
+1. ** Eco-Sharing (Manajemen Logistik Hijau)** Fasilitas bagi warga untuk mengunggah dan mencari logistik ramah lingkungan secara gratis (seperti bibit tanaman, pupuk organik, pot bekas) yang terhubung langsung ke kontak penyedia (WhatsApp/Telegram) untuk sistem COD di luar aplikasi.
+
+2. ** Eco-Information (Papan Informasi Agenda)** Mading digital satu arah khusus untuk publikasi pengumuman valid dari pengurus lingkungan (jadwal kerja bakti, pengumuman fogging, sosialisasi pilah sampah) agar informasi penting tidak tenggelam di grup chat warga.
+
+3. ** Eco-Volunteer (Mobilisasi Relawan)** Fitur pembuatan event lingkungan yang dilengkapi dengan tombol pendaftaran dinamis untuk membantu komunitas hijau mendata warga yang berkomitmen menjadi relawan aksi nyata di lapangan tanpa kertas.
+
+---
+
+##  Ruang Lingkup Sistem (Scope)
+* **Skala Wilayah:** Pembatasan akses data inputan dikunci pada tingkat **Kecamatan** agar informasi tetap relevan bagi warga lokal.
+* **Autentikasi Akun:** Sistem membedakan hak akses halaman publik (Katalog & Detail) dengan halaman privat input data (**Dashboard Warga**).
+
+---
+
+##  Struktur Tim & Pembagian Tugas
+* **Product Manager (PM):** Mengelola arsitektur data, *user flow*, dan struktur repositori.
+* **Frontend Team:** Melakukan *slicing* UI responsive menggunakan Tailwind CSS berdasarkan spesifikasi komponen halaman katalog, detail, dan form input.
+* **Backend Team:** Mengimplementasikan database relasional MySQL (Tabel `users`, `posts`, dan *pivot* `registrations`) serta mengurus logika fungsi CRUD pada framework Laravel.
+
+---
+*Proyek ini dikembangkan secara kolaboratif demi mewujudkan lingkungan tingkat lokal yang lebih hijau, bersih, dan terorganisir.*
