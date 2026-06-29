@@ -3,63 +3,36 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\User;
 
 class AdminUserController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan daftar user.
      */
     public function index()
     {
-        //
+        $users = User::where('role', 'user')
+                    ->latest()
+                    ->paginate(10);
+
+        return view('admin.user-index', compact('users'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Menghapus user.
      */
-    public function create()
+    public function destroy(User $user)
     {
-        //
-    }
+        // Mencegah admin menghapus akun sendiri
+        if ($user->id == auth()->id()) {
+            return redirect()->back()
+                ->with('error', 'Anda tidak dapat menghapus akun sendiri.');
+        }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $user->delete();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('admin.user.index')
+            ->with('success', 'User berhasil dihapus.');
     }
 }

@@ -3,47 +3,62 @@
 namespace App\Http\Controllers\Volunteer;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Kegiatan;
-use App\Models\Pendaftaran;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class VolunteerController extends Controller
 {
-    // Menampilkan semua daftar lowongan relawan
+    /**
+     * Menampilkan semua kegiatan volunteer yang masih aktif.
+     */
     public function index()
     {
-        $kegiatans = Kegiatan::all();
+        $kegiatans = Kegiatan::where('kategori', 'Eco-Volunteer')
+            ->where('status', 'aktif')
+            ->latest()
+            ->get();
+
         return view('volunteer.index', compact('kegiatans'));
     }
 
-    // Menampilkan detail salah satu lowongan relawan
+    /**
+     * Menampilkan detail kegiatan.
+     */
     public function show($id)
     {
         $kegiatan = Kegiatan::findOrFail($id);
+
         return view('volunteer.detail', compact('kegiatan'));
     }
 
-    // Menyimpan aksi/kegiatan baru ke database
+    /**
+     * Menyimpan kegiatan volunteer baru.
+     */
     public function store(Request $request)
     {
-        $request->validate([
-            'judul'       => 'required|string|max:255',
-            'deskripsi'   => 'required|string',
-            'lokasi'      => 'required|string|max:255',
-            'tanggal'     => 'required|date',
-            'kuota'       => 'required|integer|min:1',
+        $data = $request->validate([
+            'judul' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'lokasi' => 'required|string|max:255',
+            'tanggal_kejadian' => 'required|date',
+            'kuota_relawan' => 'required|integer|min:1',
+            'link_kontak' => 'nullable|string|max:255',
+            'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        Kegiatan::create([
-            'judul'       => $request->judul,
-            'deskripsi'   => $request->deskripsi,
-            'lokasi'      => $request->lokasi,
-            'tanggal'     => $request->tanggal,
-            'kuota'       => $request->kuota,
-            'user_id'     => Auth::id(),
-        ]);
+        $data['user_id'] = Auth::id();
+        $data['kategori'] = 'Eco-Volunteer';
+        $data['status'] = 'aktif';
 
-        return redirect()->route('volunteer.index')->with('success', 'Kegiatan berhasil dibuat.');
+        if ($request->hasFile('gambar')) {
+            $data['gambar'] = $request->file('gambar')->store('kegiatan', 'public');
+        }
+
+        Kegiatan::create($data);
+
+        return redirect()->route('volunteer.index')
+            ->with('success', 'Kegiatan volunteer berhasil ditambahkan.');
     }
 }

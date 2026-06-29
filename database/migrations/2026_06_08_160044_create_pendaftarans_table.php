@@ -6,22 +6,35 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-public function up(): void
-{
-    Schema::create('pendaftarans', function (Blueprint $table) {
-        $table->id('id_pendaftaran');
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('pendaftarans', function (Blueprint $table) {
 
-        // Menghubungkan pendaftaran ke ID Kegiatan terkait
-        $table->foreignId('id_kegiatan')->constrained('kegiatans', 'id_kegiatan')->onDelete('cascade');
+            $table->id('id_pendaftaran');
 
-        // KUNCI PENGAMAN: Menghubungkan ke ID User yang mendaftar
-        $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            // Relasi ke tabel kegiatans
+            $table->foreignId('kegiatan_id')
+                ->constrained('kegiatans', 'id_kegiatan')
+                ->onDelete('cascade');
 
-        // REVISI BARU: Kolom penampung alasan bergabung sesuai instruksi dosen
-        $table->text('alasan_bergabung');
-        $table->timestamps();
-    });
-}
+            // Relasi ke tabel users
+            $table->foreignId('user_id')
+                ->constrained('users')
+                ->onDelete('cascade');
+
+            // Alasan mengikuti kegiatan
+            $table->text('alasan_bergabung');
+
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('pendaftarans');

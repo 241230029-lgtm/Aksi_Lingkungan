@@ -8,24 +8,33 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Kegiatan extends Model
 {
-    // Mengunci nama tabel di database agar sinkron
+    // Nama tabel
     protected $table = 'kegiatans';
 
-    // Mendaftarkan kolom-kolom yang boleh diisi data (Mass Assignment)
+    // Primary key sesuai migration
+    protected $primaryKey = 'id_kegiatan';
+
+    // Primary key bertipe integer dan auto increment
+    public $incrementing = true;
+    protected $keyType = 'int';
+
+    // Kolom yang boleh diisi
     protected $fillable = [
         'user_id',
         'judul',
         'kategori',
         'deskripsi',
         'lokasi',
-        'tanggal',
-        'kuota',
-        'status'
+        'tanggal_kejadian',
+        'kuota_relawan',
+        'link_kontak',
+        'gambar',
+        'status',
     ];
 
     /**
-     * RELASI ELOQUENT: Belongs To (Kebalikan dari One to Many)
-     * Artinya: 1 Kegiatan/Aksi ini dibuat atau dimiliki oleh 1 User/Masyarakat.
+     * Relasi ke User
+     * Satu kegiatan dimiliki oleh satu user.
      */
     public function user(): BelongsTo
     {
@@ -33,11 +42,11 @@ class Kegiatan extends Model
     }
 
     /**
-     * RELASI ELOQUENT: One to Many
-     * Artinya: 1 Kegiatan (khusus kategori Eco-Volunteer) bisa memiliki BANYAK pendaftar relawan.
+     * Relasi ke Pendaftaran
+     * Satu kegiatan memiliki banyak pendaftaran relawan.
      */
     public function pendaftarans(): HasMany
     {
-        return $this->hasMany(Pendaftaran::class, 'kegiatan_id');
+        return $this->hasMany(Pendaftaran::class, 'kegiatan_id', 'id_kegiatan');
     }
 }
