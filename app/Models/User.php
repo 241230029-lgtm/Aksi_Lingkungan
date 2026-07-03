@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -11,17 +10,25 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'email', 'password', 'role'])] // Tambah 'role' untuk membedakan Admin & Masyarakat
-#[Hidden(['password', 'remember_token'])]
+#[Fillable([
+    'name',
+    'email',
+    'password',
+    'role'
+])]
+
+#[Hidden([
+    'password',
+    'remember_token'
+])]
+
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Casting atribut.
      */
     protected function casts(): array
     {
@@ -32,8 +39,8 @@ class User extends Authenticatable
     }
 
     /**
-     * RELASI ELOQUENT: One to Many
-     * Artinya: 1 User (Masyarakat) bisa membuat atau memposting BANYAK Kegiatan/Aksi lingkungan.
+     * Relasi User -> Kegiatan
+     * Satu user dapat membuat banyak kegiatan.
      */
     public function kegiatans(): HasMany
     {
@@ -41,11 +48,27 @@ class User extends Authenticatable
     }
 
     /**
-     * RELASI ELOQUENT: One to Many
-     * Artinya: 1 User (Masyarakat) bisa mendaftar BANYAK kali di berbagai aksi relawan yang berbeda.
+     * Relasi User -> Pendaftaran
+     * Satu user dapat memiliki banyak pendaftaran.
      */
     public function pendaftarans(): HasMany
     {
         return $this->hasMany(Pendaftaran::class, 'user_id');
+    }
+
+    /**
+     * Mengecek apakah user adalah admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Mengecek apakah user adalah masyarakat/user biasa.
+     */
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
     }
 }

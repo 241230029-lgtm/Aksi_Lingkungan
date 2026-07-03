@@ -7,20 +7,26 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Pendaftaran extends Model
 {
-    // Mengunci nama tabel di database agar sinkron
+    // Nama tabel
     protected $table = 'pendaftarans';
 
-    // Mendaftarkan kolom-kolom yang boleh diisi data
+    // Primary key sesuai migration
+    protected $primaryKey = 'id_pendaftaran';
+
+    // Primary key bertipe integer dan auto increment
+    public $incrementing = true;
+    protected $keyType = 'int';
+
+    // Kolom yang boleh diisi
     protected $fillable = [
-        'user_id',
         'kegiatan_id',
+        'user_id',
         'alasan_bergabung',
-        'status_konfirmasi'
     ];
 
     /**
-     * RELASI ELOQUENT: Belongs To
-     * Artinya: 1 lembar data pendaftaran ini mutlak milik 1 User (Masyarakat yang mendaftar).
+     * Relasi ke User
+     * Satu pendaftaran dimiliki oleh satu user.
      */
     public function user(): BelongsTo
     {
@@ -28,11 +34,11 @@ class Pendaftaran extends Model
     }
 
     /**
-     * RELASI ELOQUENT: Belongs To
-     * Artinya: 1 lembar data pendaftaran ini ditujukan untuk 1 Kegiatan/Aksi lingkungan tertentu.
+     * Relasi ke Kegiatan
+     * Satu pendaftaran dimiliki oleh satu kegiatan.
      */
     public function kegiatan(): BelongsTo
     {
-        return $this->belongsTo(Kegiatan::class, 'kegiatan_id');
+        return $this->belongsTo(Kegiatan::class, 'kegiatan_id', 'id_kegiatan');
     }
 }
