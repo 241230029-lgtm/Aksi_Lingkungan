@@ -9,14 +9,21 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::view('/', 'home')->name('home');
-
 Route::view('/katalog', 'katalog')->name('katalog');
-
 Route::view('/buat-aksi', 'create-aksi')->name('buat-aksi');
-
 Route::view('/tentang', 'about')->name('tentang');
 
+/*
+|--------------------------------------------------------------------------
+| PROFILE
+|--------------------------------------------------------------------------
+*/
+
 Route::view('/profil', 'profile')->name('profil');
+Route::view('/profil/aktivitas', 'user.aktivitas')->name('aktivitas');
+Route::view('/profil/relawan', 'user.relawan')->name('relawan');
+Route::view('/profil/pengaturan', 'user.pengaturan')->name('pengaturan');
+Route::view('/logout', 'user.logout')->name('logout');
 
 /*
 |--------------------------------------------------------------------------
@@ -25,7 +32,6 @@ Route::view('/profil', 'profile')->name('profil');
 */
 
 Route::view('/login', 'auth.login')->name('login');
-
 Route::view('/register', 'auth.register')->name('register');
 
 /*
@@ -38,33 +44,27 @@ Route::view('/dashboard', 'user.dashboard')->name('dashboard');
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN (Frontend / UI Only)
+| ADMIN (Frontend/UI Only)
 |--------------------------------------------------------------------------
 */
 
 Route::prefix('admin')->name('admin.')->group(function () {
 
-    // Dashboard
     Route::view('/dashboard', 'admin.dashboard')
         ->name('dashboard');
 
-    // User
     Route::view('/users', 'admin.user-index')
         ->name('users');
 
-    // Kegiatan
     Route::view('/kegiatan', 'admin.kegiatan-index')
         ->name('kegiatan');
 
-    // Informasi
     Route::view('/information', 'admin.information-index')
         ->name('information');
 
-    // Sharing
     Route::view('/sharing', 'admin.sharing-index')
         ->name('sharing');
 
-    // Volunteer
     Route::view('/volunteer', 'admin.volunteer-index')
         ->name('volunteer');
 });
