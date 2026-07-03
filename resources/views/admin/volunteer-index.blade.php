@@ -2,18 +2,17 @@
 
 @section('content')
 
-<div class="flex justify-between mb-8">
+<div class="flex justify-between items-center mb-8">
 
 <h1 class="text-3xl font-bold">
 
-Manajemen Kegiatan
+Manajemen Volunteer
 
 </h1>
 
-<button
-class="bg-green-600 text-white px-6 py-3 rounded-xl">
+<button class="bg-green-600 text-white px-6 py-3 rounded-xl">
 
-Tambah Kegiatan
++ Tambah Volunteer
 
 </button>
 
@@ -29,19 +28,25 @@ Tambah Kegiatan
 
 <th class="p-4">
 
-Judul
+No
 
 </th>
 
 <th>
 
-Kategori
+Nama
 
 </th>
 
 <th>
 
 Lokasi
+
+</th>
+
+<th>
+
+Peserta
 
 </th>
 
@@ -69,13 +74,13 @@ Aksi
 
 <td class="p-4">
 
-Gerakan Tanam Pohon
+{{ $i }}
 
 </td>
 
 <td>
 
-Penghijauan
+Gerakan Bersih Sungai
 
 </td>
 
@@ -87,9 +92,15 @@ Bandung
 
 <td>
 
-<span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full">
+52
 
-Menunggu
+</td>
+
+<td>
+
+<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full">
+
+Aktif
 
 </span>
 
@@ -97,15 +108,13 @@ Menunggu
 
 <td>
 
-<button
-class="bg-green-600 text-white px-3 py-2 rounded-lg">
+<button class="bg-blue-500 text-white px-3 py-2 rounded-lg">
 
-Verifikasi
+Edit
 
 </button>
 
-<button
-class="bg-red-500 text-white px-3 py-2 rounded-lg">
+<button class="bg-red-500 text-white px-3 py-2 rounded-lg">
 
 Hapus
 
