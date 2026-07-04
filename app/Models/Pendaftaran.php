@@ -22,6 +22,7 @@ class Pendaftaran extends Model
         'kegiatan_id',
         'user_id',
         'alasan_bergabung',
+        'status_konfirmasi',
     ];
 
     /**
