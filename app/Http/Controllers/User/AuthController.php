@@ -3,15 +3,14 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
     /**
      * Menampilkan halaman register.
+     * (Sementara tidak digunakan pada mode demo)
      */
     public function showRegister()
     {
@@ -19,25 +18,14 @@ class AuthController extends Controller
     }
 
     /**
-     * Proses registrasi user.
+     * Register dinonaktifkan sementara.
      */
     public function register(Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-
-        User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'role' => 'user',
-        ]);
-
-        return redirect()->route('login')
-            ->with('success', 'Registrasi berhasil. Silakan login.');
+        return redirect()->back()->with(
+            'error',
+            'Registrasi dinonaktifkan pada mode demo.'
+        );
     }
 
     /**
@@ -49,31 +37,47 @@ class AuthController extends Controller
     }
 
     /**
-     * Proses login.
+     * Login Demo.
      */
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => 'required|email',
+        $request->validate([
+            'username' => 'required|string',
             'password' => 'required|string',
         ]);
 
-        if (Auth::attempt($credentials)) {
+        $username = strtolower(trim($request->username));
+        $password = $request->password;
 
-            $request->session()->regenerate();
+        // ===========================
+        // LOGIN ADMIN
+        // ===========================
 
-            if (Auth::user()->role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            }
+        if ($username === 'admin' && $password === 'admin123') {
+
+            Session::put('login', true);
+            Session::put('role', 'admin');
+            Session::put('name', 'Administrator');
+
+            return redirect()->route('admin.dashboard');
+        }
+
+        // ===========================
+        // LOGIN MASYARAKAT
+        // ===========================
+
+        if ($username === 'masyarakat' && $password === 'masyarakat123') {
+
+            Session::put('login', true);
+            Session::put('role', 'user');
+            Session::put('name', 'Masyarakat');
 
             return redirect()->route('dashboard');
         }
 
-        return back()
-            ->withErrors([
-                'email' => 'Email atau password salah.',
-            ])
-            ->onlyInput('email');
+        return back()->withErrors([
+            'login' => 'Pengguna atau password salah.',
+        ]);
     }
 
     /**
@@ -81,12 +85,8 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        Auth::logout();
+        Session::flush();
 
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
-
-        return redirect()->route('login');
+        return redirect()->route('home');
     }
 }

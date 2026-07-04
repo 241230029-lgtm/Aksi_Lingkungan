@@ -1,15 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Platform Aksi Lingkungan</title>
-</head>
-<body>
-    <div style="background: #2e7d32; color: white; padding: 10px;">
-        <h2>Eco-Platform [Header]</h2>
-    </div>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ config('app.name', 'Aksi Lingkungan') }}</title>
 
-    <main style="padding: 20px;">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+    @include('layouts.partials.navbar')
+
+    <main>
         @yield('content')
     </main>
+
+    @include('layouts.partials.footer')
+
 </body>
 </html>

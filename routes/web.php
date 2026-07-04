@@ -2,97 +2,117 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Admin
-use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\Admin\AdminKegiatanController;
-use App\Http\Controllers\Admin\AdminUserController;
-
-// User / Auth
 use App\Http\Controllers\User\AuthController;
-use App\Http\Controllers\User\DashboardController;
-
-// Volunteer
 use App\Http\Controllers\Volunteer\VolunteerController;
 use App\Http\Controllers\Volunteer\PendaftaranVolunteerController;
-
-// Sharing
 use App\Http\Controllers\Sharing\SharingController;
-
-// Information (Mading)
 use App\Http\Controllers\Information\InformationController;
 
 /*
 |--------------------------------------------------------------------------
-| RUTE PUBLIK
+| PUBLIC
 |--------------------------------------------------------------------------
 */
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+
+Route::view('/', 'home')->name('home');
+Route::view('/katalog', 'katalog')->name('katalog');
+Route::view('/buat-aksi', 'create-aksi')->name('buat-aksi');
+Route::view('/tentang', 'about')->name('tentang');
 
 /*
 |--------------------------------------------------------------------------
-| RUTE AUTENTIKASI
+| PROFILE
 |--------------------------------------------------------------------------
 */
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register']);
-});
+
+Route::view('/profil', 'profile')->name('profil');
+Route::view('/profil/aktivitas', 'user.aktivitas')->name('aktivitas');
+Route::view('/profil/relawan', 'user.relawan')->name('relawan');
+Route::view('/profil/pengaturan', 'user.pengaturan')->name('pengaturan');
+
+/*
+|--------------------------------------------------------------------------
+| AUTH
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/login', [AuthController::class, 'showLogin'])
+    ->name('login');
+
+Route::post('/login', [AuthController::class, 'login'])
+    ->name('login.process');
+
+Route::get('/register', [AuthController::class, 'showRegister'])
+    ->name('register');
+
+Route::post('/register', [AuthController::class, 'register'])
+    ->name('register.process');
 
 Route::post('/logout', [AuthController::class, 'logout'])
-    ->middleware('auth')
     ->name('logout');
 
 /*
 |--------------------------------------------------------------------------
-| RUTE FITUR Eco-Volunteer (Relawan)
+| USER
 |--------------------------------------------------------------------------
 */
-Route::get('/volunteer', [VolunteerController::class, 'index'])->name('volunteer.index');
-Route::get('/volunteer/{id}', [VolunteerController::class, 'show'])->name('volunteer.show');
+
+Route::view('/dashboard', 'user.dashboard')
+    ->name('dashboard');
 
 /*
 |--------------------------------------------------------------------------
-| RUTE FITUR Eco-Sharing
+| FITUR Eco-Volunteer (Relawan)
 |--------------------------------------------------------------------------
 */
+
+Route::get('/volunteer', [VolunteerController::class, 'index'])->name('volunteer.index');
+Route::get('/volunteer/{id}', [VolunteerController::class, 'show'])->name('volunteer.show');
+Route::post('/volunteer', [VolunteerController::class, 'store'])->name('volunteer.store');
+Route::post('/volunteer/{id}/daftar', [PendaftaranVolunteerController::class, 'store'])
+    ->name('volunteer.daftar');
+
+/*
+|--------------------------------------------------------------------------
+| FITUR Eco-Sharing
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/sharing', [SharingController::class, 'index'])->name('sharing.index');
 Route::get('/sharing/{id}', [SharingController::class, 'show'])->name('sharing.show');
 
 /*
 |--------------------------------------------------------------------------
-| RUTE FITUR Eco-Information (Mading)
+| FITUR Eco-Information (Mading)
 |--------------------------------------------------------------------------
 */
+
 Route::get('/information', [InformationController::class, 'index'])->name('information.index');
 Route::get('/information/{id}', [InformationController::class, 'show'])->name('information.show');
 
 /*
 |--------------------------------------------------------------------------
-| RUTE KHUSUS USER LOGIN (Masyarakat)
+| ADMIN
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Membuat aksi/kegiatan volunteer baru
-    Route::post('/volunteer', [VolunteerController::class, 'store'])->name('volunteer.store');
+Route::prefix('admin')->name('admin.')->group(function () {
 
-    // Mendaftar sebagai relawan pada kegiatan tertentu
-    Route::post('/volunteer/{id}/daftar', [PendaftaranVolunteerController::class, 'store'])
-        ->name('volunteer.daftar');
-});
+    Route::view('/dashboard', 'admin.dashboard')
+        ->name('dashboard');
 
-/*
-|--------------------------------------------------------------------------
-| RUTE ADMIN
-|--------------------------------------------------------------------------
-*/
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::resource('kegiatan', AdminKegiatanController::class);
-    Route::resource('user', AdminUserController::class)->only(['index', 'destroy']);
+    Route::view('/users', 'admin.user-index')
+        ->name('users');
+
+    Route::view('/kegiatan', 'admin.kegiatan-index')
+        ->name('kegiatan');
+
+    Route::view('/information', 'admin.information-index')
+        ->name('information');
+
+    Route::view('/sharing', 'admin.sharing-index')
+        ->name('sharing');
+
+    Route::view('/volunteer', 'admin.volunteer-index')
+        ->name('volunteer');
 });
