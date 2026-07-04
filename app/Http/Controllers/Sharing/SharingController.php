@@ -3,32 +3,36 @@
 namespace App\Http\Controllers\Sharing;
 
 use App\Http\Controllers\Controller;
-use App\Models\Kegiatan;
+use Illuminate\Http\Request;
+use App\Models\Sharing;
+use Illuminate\Support\Facades\Auth;
 
 class SharingController extends Controller
 {
-    /**
-     * Menampilkan semua kegiatan Eco-Sharing.
-     */
+    // GET: ambil semua data
     public function index()
     {
-        $sharings = Kegiatan::where('kategori', 'Eco-Sharing')
-            ->where('status', 'aktif')
+        $sharing = Sharing::with('user')
             ->latest()
             ->get();
 
-        return view('sharing.index', compact('sharings'));
+        return view('sharing.index', compact('sharing'));
     }
 
-    /**
-     * Menampilkan detail kegiatan Eco-Sharing.
-     */
-    public function show($id)
+    // POST: simpan data
+    public function store(Request $request)
     {
-        $sharing = Kegiatan::where('kategori', 'Eco-Sharing')
-            ->where('id_kegiatan', $id)
-            ->firstOrFail();
+        $request->validate([
+            'judul' => 'required|string',
+            'cerita' => 'required|string',
+        ]);
 
-        return view('sharing.detail', compact('sharing'));
+        Sharing::create([
+            'user_id' => Auth::id() ?? 1, // fallback biar tidak error
+            'judul' => $request->judul,
+            'cerita' => $request->cerita,
+        ]);
+
+        return redirect('/sharing');
     }
 }
