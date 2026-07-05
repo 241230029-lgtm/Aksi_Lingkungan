@@ -10,11 +10,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+// FIX: Menambahkan 'phone' dan 'alamat' agar diizinkan masuk ke database MySQL
 #[Fillable([
     'name',
     'email',
     'password',
-    'role'
+    'role',
+    'phone',
+    'alamat'
 ])]
 
 #[Hidden([

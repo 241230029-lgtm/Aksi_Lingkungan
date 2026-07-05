@@ -2,43 +2,23 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Pendaftaran extends Model
 {
-    // Nama tabel
+    use HasFactory;
+
+    // Menghubungkan ke tabel 'pendaftarans' yang ada di phpMyAdmin Anda
     protected $table = 'pendaftarans';
 
-    // Primary key sesuai migration
-    protected $primaryKey = 'id_pendaftaran';
-
-    // Primary key bertipe integer dan auto increment
-    public $incrementing = true;
-    protected $keyType = 'int';
-
-    // Kolom yang boleh diisi
+    // Sesuaikan field ini dengan struktur kolom yang ada di tabel pendaftarans kelompok Anda
     protected $fillable = [
-        'kegiatan_id',
-        'user_id',
-        'alasan_bergabung',
+        'nama_program',
+        'kategori',
+        'lokasi',
+        'kuota',
+        'deskripsi',
+        'syarat'
     ];
-
-    /**
-     * Relasi ke User
-     * Satu pendaftaran dimiliki oleh satu user.
-     */
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    /**
-     * Relasi ke Kegiatan
-     * Satu pendaftaran dimiliki oleh satu kegiatan.
-     */
-    public function kegiatan(): BelongsTo
-    {
-        return $this->belongsTo(Kegiatan::class, 'kegiatan_id', 'id_kegiatan');
-    }
 }

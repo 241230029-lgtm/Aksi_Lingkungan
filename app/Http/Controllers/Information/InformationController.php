@@ -3,32 +3,90 @@
 namespace App\Http\Controllers\Information;
 
 use App\Http\Controllers\Controller;
-use App\Models\Kegiatan;
+use App\Models\Information;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class InformationController extends Controller
 {
     /**
-     * Menampilkan semua informasi lingkungan.
+     * Menampilkan daftar artikel informasi
      */
-    public function index()
+    public function index(Request $request)
     {
-        $informations = Kegiatan::where('kategori', 'Eco-Information')
-            ->where('status', 'aktif')
-            ->latest()
-            ->get();
+        $query = Information::query();
 
-        return view('information.index', compact('informations'));
+        if ($request->filled('search')) {
+            $query->where('judul', 'like', '%' . $request->search . '%');
+        }
+
+        $informations = $query->latest()->paginate(10);
+
+        return view('admin.information-index', compact('informations'));
     }
 
     /**
-     * Menampilkan detail informasi.
+     * Menyimpan artikel edukasi baru
      */
-    public function show($id)
+    public function store(Request $request)
     {
-        $information = Kegiatan::where('kategori', 'Eco-Information')
-            ->where('id_kegiatan', $id)
-            ->firstOrFail();
+        $data = $request->validate([
+            'judul'    => 'required|string|max:255',
+            'kategori' => 'required|string|max:100',
+            'konten'   => 'required|string',
+            'penulis'  => 'required|string|max:100',
+            'gambar'   => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
 
-        return view('information.detail', compact('information'));
+        if ($request->hasFile('gambar')) {
+            $data['gambar'] = $request->file('gambar')->store('information', 'public');
+        }
+
+        Information::create($data);
+
+        return redirect()->route('admin.information')->with('success', 'Artikel informasi berhasil diterbitkan.');
+    }
+
+    /**
+     * Memperbarui artikel edukasi
+     */
+    public function update(Request $request, $id)
+    {
+        $info = Information::findOrFail($id);
+
+        $data = $request->validate([
+            'judul'    => 'required|string|max:255',
+            'kategori' => 'required|string|max:100',
+            'konten'   => 'required|string',
+            'penulis'  => 'required|string|max:100',
+            'gambar'   => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        if ($request->hasFile('gambar')) {
+            if ($info->gambar && Storage::disk('public')->exists($info->gambar)) {
+                Storage::disk('public')->delete($info->gambar);
+            }
+            $data['gambar'] = $request->file('gambar')->store('information', 'public');
+        }
+
+        $info->update($data);
+
+        return redirect()->route('admin.information')->with('success', 'Artikel informasi berhasil diperbarui.');
+    }
+
+    /**
+     * Menghapus artikel secara permanen
+     */
+    public function destroy($id)
+    {
+        $info = Information::findOrFail($id);
+
+        if ($info->gambar && Storage::disk('public')->exists($info->gambar)) {
+            Storage::disk('public')->delete($info->gambar);
+        }
+
+        $info->delete();
+
+        return redirect()->route('admin.information')->with('success', 'Artikel informasi berhasil dihapus.');
     }
 }

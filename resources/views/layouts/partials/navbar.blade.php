@@ -12,12 +12,15 @@
                 </div>
 
                 <div>
+
                     <h1 class="font-bold text-xl text-green-700">
                         AKSI
                     </h1>
+
                     <p class="text-xs text-gray-500 tracking-widest">
                         LINGKUNGAN
                     </p>
+
                 </div>
 
             </a>
@@ -25,47 +28,91 @@
             <!-- Menu -->
             <div class="hidden lg:flex items-center gap-8 text-gray-700 font-medium">
 
-                <a href="{{ route('home') }}"
-                    class="hover:text-green-600 transition duration-300">
+                @if(session('role') == 'admin')
 
-                    Beranda
+                    <a href="{{ route('admin.dashboard') }}"
+                        class="hover:text-green-600 transition">
 
-                </a>
+                        Dashboard
 
-                <a href="{{ route('katalog') }}"
-                    class="hover:text-green-600 transition duration-300">
+                    </a>
 
-                    Katalog
+                    <a href="{{ route('admin.users') }}"
+                        class="hover:text-green-600 transition">
 
-                </a>
+                        Pengguna
 
-                <a href="{{ route('buat-aksi') }}"
-                    class="hover:text-green-600 transition duration-300">
+                    </a>
 
-                    Buat Aksi
+                    <a href="{{ route('admin.kegiatan') }}"
+                        class="hover:text-green-600 transition">
 
-                </a>
+                        Kegiatan
 
-                <a href="{{ route('tentang') }}"
-                    class="hover:text-green-600 transition duration-300">
+                    </a>
 
-                    Tentang
+                    <a href="{{ route('admin.information') }}"
+                        class="hover:text-green-600 transition">
 
-                </a>
+                        Informasi
 
-                <a href="{{ route('dashboard') }}"
-                    class="hover:text-green-600 transition duration-300">
+                    </a>
 
-                    Dashboard
+                    <a href="{{ route('admin.sharing') }}"
+                        class="hover:text-green-600 transition">
 
-                </a>
+                        Sharing
+
+                    </a>
+
+                    <a href="{{ route('admin.volunteer') }}"
+                        class="hover:text-green-600 transition">
+
+                        Relawan
+
+                    </a>
+
+                @else
+
+                    <a href="{{ route('dashboard') }}"
+                        class="hover:text-green-600 transition">
+
+                        Dashboard
+
+                    </a>
+
+                    <a href="{{ route('katalog') }}"
+                        class="hover:text-green-600 transition">
+
+                        Katalog
+
+                    </a>
+
+                    <a href="{{ route('buat-aksi') }}"
+                        class="hover:text-green-600 transition">
+
+                        Buat Aksi
+
+                    </a>
+
+                    <a href="{{ route('tentang') }}"
+                        class="hover:text-green-600 transition">
+
+                        Tentang
+
+                    </a>
+
+                @endif
 
             </div>
 
             <!-- Right -->
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-5">
+
+                @if(session('role') == 'user')
 
                 <!-- Notification -->
+
                 <button class="relative">
 
                     <svg xmlns="http://www.w3.org/2000/svg"
@@ -85,26 +132,48 @@
 
                 </button>
 
+                @endif
+
                 <!-- Profile -->
-                <div class="flex items-center gap-3 cursor-pointer">
+
+                <div class="flex items-center gap-3">
 
                     <img
-                        src="https://ui-avatars.com/api/?name=Budi+Santoso&background=16a34a&color=fff"
+                        src="https://ui-avatars.com/api/?name={{ urlencode(session('name')) }}&background=16a34a&color=fff"
                         class="w-10 h-10 rounded-full">
 
                     <div class="hidden md:block">
 
                         <h3 class="font-semibold">
-                            Budi Santoso
+
+                            {{ session('name') }}
+
                         </h3>
 
                         <p class="text-xs text-gray-500">
-                            Masyarakat
+
+                            {{ session('role') == 'admin' ? 'Administrator' : 'Masyarakat' }}
+
                         </p>
 
                     </div>
 
                 </div>
+
+                <!-- Logout -->
+
+                <form action="{{ route('logout') }}" method="POST">
+
+                    @csrf
+
+                    <button
+                        class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">
+
+                        Logout
+
+                    </button>
+
+                </form>
 
             </div>
 
