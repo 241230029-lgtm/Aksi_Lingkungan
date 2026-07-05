@@ -3,62 +3,85 @@
 namespace App\Http\Controllers\Volunteer;
 
 use App\Http\Controllers\Controller;
-use App\Models\Kegiatan;
+use App\Models\Pendaftaran; // Menggunakan model Pendaftaran sesuai database Anda
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class VolunteerController extends Controller
 {
     /**
-     * Menampilkan semua kegiatan volunteer yang masih aktif.
+     * Tampilan Fitur Utama Publik / User Front-End
      */
     public function index()
     {
-        $kegiatans = Kegiatan::where('kategori', 'Eco-Volunteer')
-            ->where('status', 'aktif')
-            ->latest()
-            ->get();
-
-        return view('volunteer.index', compact('kegiatans'));
+        $volunteers = Pendaftaran::latest()->get();
+        return view('volunteer.index', compact('volunteers'));
     }
 
-    /**
-     * Menampilkan detail kegiatan.
-     */
     public function show($id)
     {
-        $kegiatan = Kegiatan::findOrFail($id);
-
-        return view('volunteer.detail', compact('kegiatan'));
+        $volunteer = Pendaftaran::findOrFail($id);
+        return view('volunteer.show', compact('volunteer'));
     }
 
     /**
-     * Menyimpan kegiatan volunteer baru.
+     * =========================================================================
+     * PANEL ADMIN: Manajemen Lowongan Relawan Menggunakan Tabel Pendaftarans
+     * =========================================================================
      */
-    public function store(Request $request)
+    public function adminIndex(Request $request)
     {
-        $data = $request->validate([
-            'judul' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
-            'lokasi' => 'required|string|max:255',
-            'tanggal_kejadian' => 'required|date',
-            'kuota_relawan' => 'required|integer|min:1',
-            'link_kontak' => 'nullable|string|max:255',
-            'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
+        $query = Pendaftaran::query();
 
-        $data['user_id'] = Auth::id();
-        $data['kategori'] = 'Eco-Volunteer';
-        $data['status'] = 'aktif';
-
-        if ($request->hasFile('gambar')) {
-            $data['gambar'] = $request->file('gambar')->store('kegiatan', 'public');
+        if ($request->filled('search')) {
+            // Sesuai dengan Sub-CPMK 6 RPS Web Lanjut: Pencarian data tingkat lanjut
+            $query->where('nama_program', 'like', '%' . $request->search . '%');
         }
 
-        Kegiatan::create($data);
+        // Pagination dengan style Tailwind sesuai standar RPS Web Lanjut
+        $volunteers = $query->latest()->paginate(10);
 
-        return redirect()->route('volunteer.index')
-            ->with('success', 'Kegiatan volunteer berhasil ditambahkan.');
+        return view('admin.volunteer-index', compact('volunteers'));
+    }
+
+    public function adminStore(Request $request)
+    {
+        $data = $request->validate([
+            'nama_program' => 'required|string|max:255',
+            'kategori'     => 'required|string|max:100',
+            'lokasi'       => 'required|string|max:255',
+            'kuota'        => 'required|integer|min:1',
+            'deskripsi'    => 'required|string',
+            'syarat'       => 'required|string',
+        ]);
+
+        Pendaftaran::create($data);
+
+        return redirect()->route('admin.volunteer')->with('success', 'Program lowongan relawan baru berhasil dibuka!');
+    }
+
+    public function adminUpdate(Request $request, $id)
+    {
+        $volunteer = Pendaftaran::findOrFail($id);
+
+        $data = $request->validate([
+            'nama_program' => 'required|string|max:255',
+            'kategori'     => 'required|string|max:100',
+            'lokasi'       => 'required|string|max:255',
+            'kuota'        => 'required|integer|min:1',
+            'deskripsi'    => 'required|string',
+            'syarat'       => 'required|string',
+        ]);
+
+        $volunteer->update($data);
+
+        return redirect()->route('admin.volunteer')->with('success', 'Informasi program relawan berhasil diperbarui.');
+    }
+
+    public function adminDestroy($id)
+    {
+        $volunteer = Pendaftaran::findOrFail($id);
+        $volunteer->delete();
+
+        return redirect()->route('admin.volunteer')->with('success', 'Program relawan berhasil dihapus dari sistem.');
     }
 }
