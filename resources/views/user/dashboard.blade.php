@@ -104,7 +104,7 @@
                             @foreach($aktivitasTerbaru as $index => $kegiatan)
                                 <tr class="hover:bg-gray-50/50 transition">
                                     <td class="py-4 px-6 text-center text-gray-400 font-medium">{{ $index + 1 }}</td>
-                                    <td class="py-4 px-6 font-semibold text-gray-950 max-w-sm truncate">{{ $kegiatan->nama_program }}</td>
+                                    <td class="py-4 px-6 font-semibold text-gray-950 max-w-sm truncate">{{ $kegiatan->judul }}</td>
                                     <td class="py-4 px-6 text-gray-500">{{ $kegiatan->lokasi }}</td>
                                     <td class="py-4 px-6 text-center">
                                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">Aktif</span>

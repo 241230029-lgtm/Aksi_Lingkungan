@@ -10,10 +10,9 @@ class AdminDashboardController extends Controller
 {
     public function index()
     {
-        $totalUser      = User::where('role', 'user')->count(); // Menghitung hanya relawan/masyarakat
+        $totalUser      = User::where('role', 'user')->count();
         $totalKegiatan  = Kegiatan::count();
 
-        // Data Fallback jika model belum dibuat kelompok Anda
         $totalArtikel   = class_exists('App\Models\Artikel') ? \App\Models\Artikel::count() : 0;
         $totalSharing   = class_exists('App\Models\Sharing') ? \App\Models\Sharing::count() : 0;
 

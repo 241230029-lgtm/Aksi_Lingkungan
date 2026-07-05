@@ -5,49 +5,46 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Kegiatan;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class AdminKegiatanController extends Controller
 {
-    /**
-     * Menampilkan semua data kegiatan dengan fitur pencarian.
-     */
     public function index(Request $request)
     {
-        $query = Kegiatan::query();
+        $kegiatan = Kegiatan::when($request->search, function ($query, $search) {
+            $query->where('judul', 'like', '%' . $search . '%');
+        })->latest()->paginate(10);
 
-        // Fitur pencarian berdasarkan judul
-        if ($request->filled('search')) {
-            $query->where('judul', 'like', '%' . $request->search . '%');
-        }
-
-        // Menggunakan pagination 10 data per halaman
-        $kegiatan = $query->latest()->paginate(10);
-
-        return view('admin.kegiatan-index', compact('kegiatan'));
+        return view('admin.kegiatan.index', compact('kegiatan'));
     }
 
-    /**
-     * Menyimpan data kegiatan baru ke MySQL.
-     */
+    public function editJson($id)
+    {
+        $kegiatan = Kegiatan::findOrFail($id);
+        return response()->json($kegiatan);
+    }
+
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'judul'            => 'required|string|max:255',
-            'kategori'          => 'required|in:Eco-Sharing,Eco-Information,Eco-Volunteer',
-            'deskripsi'         => 'required|string',
-            'lokasi'            => 'required|string|max:255',
-            'tanggal_kejadian'  => 'nullable|date',
-            'kuota_relawan'     => 'nullable|integer|min:1',
-            'link_kontak'       => 'nullable|string|max:255',
-            'gambar'            => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'status'            => 'required|in:aktif,selesai',
+        $request->validate([
+            'judul'           => 'required|string|max:255',
+            'kategori'        => 'required|in:Eco-Sharing,Eco-Information,Eco-Volunteer',
+            'lokasi'          => 'required|string|max:255',
+            'tanggal_kejadian'=> 'nullable|date',
+            'kuota_relawan'   => 'nullable|integer|min:1',
+            'link_kontak'     => 'nullable|url',
+            'deskripsi'       => 'required|string',
+            'gambar'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'status'          => 'required|in:aktif,selesai',
         ]);
 
-        // FIXED SAFEGUARD: Ambil ID user/admin yang login.
-        // Jika session kosong saat testing, otomatis gunakan ID 1 agar database tidak crash.
-        $data['user_id'] = Auth::id() ?? 1;
+        $data = $request->only([
+            'judul', 'kategori', 'lokasi', 'tanggal_kejadian',
+            'kuota_relawan', 'link_kontak', 'deskripsi', 'status'
+        ]);
+
+        // TAMBAHKAN INI: Set user_id default karena admin login manual
+        $data['user_id'] = 1;
 
         if ($request->hasFile('gambar')) {
             $data['gambar'] = $request->file('gambar')->store('kegiatan', 'public');
@@ -55,31 +52,34 @@ class AdminKegiatanController extends Controller
 
         Kegiatan::create($data);
 
-        return redirect()->route('admin.kegiatan')
-            ->with('success', 'Data kegiatan berhasil ditambahkan.');
+        return redirect()->route('admin.kegiatan')->with('success', 'Kegiatan berhasil ditambahkan.');
     }
 
-    /**
-     * Memperbarui data kegiatan (Update).
-     */
     public function update(Request $request, $id)
     {
         $kegiatan = Kegiatan::findOrFail($id);
 
-        $data = $request->validate([
-            'judul'            => 'required|string|max:255',
-            'kategori'          => 'required|in:Eco-Sharing,Eco-Information,Eco-Volunteer',
-            'deskripsi'         => 'required|string',
-            'lokasi'            => 'required|string|max:255',
-            'tanggal_kejadian'  => 'nullable|date',
-            'kuota_relawan'     => 'nullable|integer|min:1',
-            'link_kontak'       => 'nullable|string|max:255',
-            'gambar'            => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'status'            => 'required|in:aktif,selesai',
+        $request->validate([
+            'judul'           => 'required|string|max:255',
+            'kategori'        => 'required|in:Eco-Sharing,Eco-Information,Eco-Volunteer',
+            'lokasi'          => 'required|string|max:255',
+            'tanggal_kejadian'=> 'nullable|date',
+            'kuota_relawan'   => 'nullable|integer|min:1',
+            'link_kontak'     => 'nullable|url',
+            'deskripsi'       => 'required|string',
+            'gambar'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'status'          => 'required|in:aktif,selesai',
         ]);
 
+        $data = $request->only([
+            'judul', 'kategori', 'lokasi', 'tanggal_kejadian',
+            'kuota_relawan', 'link_kontak', 'deskripsi', 'status'
+        ]);
+
+        // PERTAHANKAN user_id LAMA
+        $data['user_id'] = $kegiatan->user_id;
+
         if ($request->hasFile('gambar')) {
-            // Hapus gambar lama jika ada
             if ($kegiatan->gambar && Storage::disk('public')->exists($kegiatan->gambar)) {
                 Storage::disk('public')->delete($kegiatan->gambar);
             }
@@ -88,13 +88,9 @@ class AdminKegiatanController extends Controller
 
         $kegiatan->update($data);
 
-        return redirect()->route('admin.kegiatan')
-            ->with('success', 'Data kegiatan berhasil diperbarui.');
+        return redirect()->route('admin.kegiatan')->with('success', 'Kegiatan berhasil diperbarui.');
     }
 
-    /**
-     * Menghapus data kegiatan secara permanen.
-     */
     public function destroy($id)
     {
         $kegiatan = Kegiatan::findOrFail($id);
@@ -105,7 +101,6 @@ class AdminKegiatanController extends Controller
 
         $kegiatan->delete();
 
-        return redirect()->route('admin.kegiatan')
-            ->with('success', 'Data kegiatan berhasil dihapus.');
+        return redirect()->route('admin.kegiatan')->with('success', 'Kegiatan berhasil dihapus.');
     }
 }

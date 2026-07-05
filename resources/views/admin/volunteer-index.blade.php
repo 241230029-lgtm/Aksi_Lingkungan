@@ -43,12 +43,12 @@
                     @foreach($volunteers as $index => $item)
                         <tr class="hover:bg-gray-50/50 transition">
                             <td class="p-4 px-6 text-center text-gray-400 font-medium">{{ $index + 1 }}</td>
-                            <td class="p-4 px-6 font-bold text-gray-900 max-w-xs truncate" title="{{ $item->nama_program }}">{{ $item->nama_program }}</td>
+                            <td class="p-4 px-6 font-bold text-gray-900 max-w-xs truncate" title="{{ $item->judul }}">{{ $item->judul }}</td>
                             <td class="p-4 px-6">
                                 <span class="bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-0.5 rounded-md text-xs font-semibold">{{ $item->kategori }}</span>
                             </td>
                             <td class="p-4 px-6 text-gray-600">{{ $item->lokasi }}</td>
-                            <td class="p-4 px-6 text-center font-bold text-blue-600">{{ $item->kuota }} Orang</td>
+                            <td class="p-4 px-6 text-center font-bold text-blue-600">{{ $item->kuota_relawan ?? '∞' }} Orang</td>
                             <td class="p-4 px-6 text-center flex items-center justify-center gap-2 mt-1">
                                 <button onclick="openEditModal({{ json_encode($item) }})" class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-100 transition cursor-pointer">
                                     Edit
@@ -79,15 +79,15 @@
             @csrf
             <div>
                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Nama Program Relawan</label>
-                <input type="text" name="nama_program" required placeholder="Contoh: Bersih Pantai Berbatu" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm">
+                <input type="text" name="judul" required placeholder="Contoh: Bersih Pantai Berbatu" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm">
             </div>
             <div class="grid grid-cols-3 gap-4">
                 <div class="col-span-1">
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Kategori</label>
                     <select name="kategori" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm">
-                        <option value="Volunteer">Volunteer</option>
-                        <option value="Edukasi">Edukasi</option>
-                        <option value="Penghijauan">Penghijauan</option>
+                        <option value="Eco-Volunteer">Eco-Volunteer</option>
+                        <option value="Eco-Information">Eco-Information</option>
+                        <option value="Eco-Sharing">Eco-Sharing</option>
                     </select>
                 </div>
                 <div class="col-span-1">
@@ -96,7 +96,7 @@
                 </div>
                 <div class="col-span-1">
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Kuota (Orang)</label>
-                    <input type="number" name="kuota" min="1" required placeholder="50" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm">
+                    <input type="number" name="kuota_relawan" min="1" required placeholder="50" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm">
                 </div>
             </div>
             <div>
@@ -104,8 +104,8 @@
                 <textarea name="deskripsi" required rows="3" placeholder="Tulis rincian apa saja yang akan dikerjakan relawan di lapangan..." class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm"></textarea>
             </div>
             <div>
-                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Persyaratan Ikut Serta</label>
-                <textarea name="syarat" required rows="2" placeholder="Contoh: Membawa botol minum sendiri, Sehat jasmani..." class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm"></textarea>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Link Kontak (opsional)</label>
+                <input type="text" name="link_kontak" placeholder="https://wa.me/628123..." class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm">
             </div>
             <div class="pt-4 border-t border-gray-100 flex justify-end gap-2">
                 <button type="button" onclick="closeModal('modalTambahVolunteer')" class="px-4 py-2 text-sm text-gray-500 rounded-xl hover:bg-gray-50">Batal</button>
@@ -126,15 +126,15 @@
             @method('PUT')
             <div>
                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Nama Program Relawan</label>
-                <input type="text" id="edit_nama_program" name="nama_program" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
+                <input type="text" id="edit_nama_program" name="judul" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
             </div>
             <div class="grid grid-cols-3 gap-4">
                 <div class="col-span-1">
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Kategori</label>
                     <select id="edit_kategori" name="kategori" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
-                        <option value="Volunteer">Volunteer</option>
-                        <option value="Edukasi">Edukasi</option>
-                        <option value="Penghijauan">Penghijauan</option>
+                        <option value="Eco-Volunteer">Volunteer</option>
+                        <option value="Eco-Information">Edukasi</option>
+                        <option value="Eco-Sharing">Penghijauan</option>
                     </select>
                 </div>
                 <div class="col-span-1">
@@ -143,7 +143,7 @@
                 </div>
                 <div class="col-span-1">
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Kuota (Orang)</label>
-                    <input type="number" id="edit_kuota" name="kuota" min="1" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
+                    <input type="number" id="edit_kuota" name="kuota_relawan" min="1" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
                 </div>
             </div>
             <div>
@@ -151,8 +151,8 @@
                 <textarea id="edit_deskripsi" name="deskripsi" required rows="3" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm"></textarea>
             </div>
             <div>
-                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Persyaratan Ikut Serta</label>
-                <textarea id="edit_syarat" name="syarat" required rows="2" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm"></textarea>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Link Kontak (opsional)</label>
+                <input type="text" id="edit_link_kontak" name="link_kontak" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
             </div>
             <div class="pt-4 border-t border-gray-100 flex justify-end gap-2">
                 <button type="button" onclick="closeModal('modalEditVolunteer')" class="px-4 py-2 text-sm text-gray-500 rounded-xl hover:bg-gray-50">Batal</button>
@@ -177,13 +177,13 @@
         document.body.style.overflow = '';
     }
     function openEditModal(data) {
-        document.getElementById('editVolunteerForm').action = `/admin/volunteer/update/${data.id}`;
-        document.getElementById('edit_nama_program').value = data.nama_program;
+        document.getElementById('editVolunteerForm').action = `/admin/volunteer/update/${data.id_kegiatan}`;
+        document.getElementById('edit_nama_program').value = data.judul;
         document.getElementById('edit_kategori').value = data.kategori;
         document.getElementById('edit_lokasi').value = data.lokasi;
-        document.getElementById('edit_kuota').value = data.kuota;
+        document.getElementById('edit_kuota').value = data.kuota_relawan || '';
         document.getElementById('edit_deskripsi').value = data.deskripsi;
-        document.getElementById('edit_syarat').value = data.syarat;
+        document.getElementById('edit_link_kontak').value = data.link_kontak || '';
         openModal('modalEditVolunteer');
     }
     function triggerDelete(id) {
