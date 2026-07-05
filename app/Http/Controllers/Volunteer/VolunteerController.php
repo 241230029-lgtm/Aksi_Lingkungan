@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Volunteer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kegiatan;
+use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -30,7 +31,16 @@ class VolunteerController extends Controller
     {
         $kegiatan = Kegiatan::findOrFail($id);
 
-        return view('volunteer.detail', compact('kegiatan'));
+        $jumlahPendaftar = Pendaftaran::where('kegiatan_id', $kegiatan->id_kegiatan)->count();
+
+        $sudahDaftar = false;
+        if (Auth::check()) {
+            $sudahDaftar = Pendaftaran::where('kegiatan_id', $kegiatan->id_kegiatan)
+                ->where('user_id', Auth::id())
+                ->exists();
+        }
+
+        return view('volunteer.detail', compact('kegiatan', 'jumlahPendaftar', 'sudahDaftar'));
     }
 
     /**
