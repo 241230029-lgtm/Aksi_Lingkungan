@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\User\AuthController;
+use App\Http\Controllers\User\DashboardController; // <--- SUDAH DITAMBAHKAN
 use App\Http\Controllers\Volunteer\VolunteerController;
 use App\Http\Controllers\Volunteer\PendaftaranVolunteerController;
 use App\Http\Controllers\Sharing\SharingController;
@@ -50,6 +51,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::view('/dashboard', 'user.dashboard')->name('dashboard');
 
 /*
+// FIXED: Menggunakan Route::get dan memanggil DashboardController agar data $user terkirim
+// Kembalikan menjadi seperti ini (Hapus ->middleware('auth')):
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');/*
 |--------------------------------------------------------------------------
 | FITUR-FITUR UTAMA (HALAMAN DEPAN)
 |--------------------------------------------------------------------------
@@ -91,22 +95,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/kegiatan/update/{id}', [AdminKegiatanController::class, 'update'])->name('kegiatan.update');
     Route::delete('/kegiatan/{id}', [AdminKegiatanController::class, 'destroy'])->name('kegiatan.destroy');
 
-    // Rute Side Manajemen Informasi (SUDAH DIBERSIHKAN DARI ROUTE::VIEW)
+    // Rute Side Manajemen Informasi
     Route::get('/information', [InformationController::class, 'index'])->name('information');
     Route::post('/information/store', [InformationController::class, 'store'])->name('information.store');
     Route::put('/information/update/{id}', [InformationController::class, 'update'])->name('information.update');
     Route::delete('/information/{id}', [InformationController::class, 'destroy'])->name('information.destroy');
 
-// Ubah baris sharing menjadi seperti ini di dalam group admin Anda:
+    // Rute Side Manajemen Sharing
     Route::get('/sharing', [SharingController::class, 'adminIndex'])->name('sharing');
     Route::post('/sharing/store', [SharingController::class, 'adminStore'])->name('sharing.store');
     Route::put('/sharing/update/{id}', [SharingController::class, 'adminUpdate'])->name('sharing.update');
     Route::delete('/sharing/{id}', [SharingController::class, 'adminDestroy'])->name('sharing.destroy');
 
-
-
-
-// Ganti baris volunteer lama di dalam Group Admin Anda menjadi seperti ini:
+    // Rute Side Manajemen Volunteer
     Route::get('/volunteer', [VolunteerController::class, 'adminIndex'])->name('volunteer');
     Route::post('/volunteer/store', [VolunteerController::class, 'adminStore'])->name('volunteer.store');
     Route::put('/volunteer/update/{id}', [VolunteerController::class, 'adminUpdate'])->name('volunteer.update');

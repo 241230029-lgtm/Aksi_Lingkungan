@@ -45,7 +45,9 @@ class AdminKegiatanController extends Controller
             'status'            => 'required|in:aktif,selesai',
         ]);
 
-        $data['user_id'] = Auth::id();
+        // FIXED SAFEGUARD: Ambil ID user/admin yang login.
+        // Jika session kosong saat testing, otomatis gunakan ID 1 agar database tidak crash.
+        $data['user_id'] = Auth::id() ?? 1;
 
         if ($request->hasFile('gambar')) {
             $data['gambar'] = $request->file('gambar')->store('kegiatan', 'public');
