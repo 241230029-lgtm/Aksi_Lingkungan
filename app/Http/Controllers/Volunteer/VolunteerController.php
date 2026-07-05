@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Volunteer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pendaftaran; // Menggunakan model Pendaftaran sesuai database Anda
+use App\Models\Kegiatan;
+use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
 
 class VolunteerController extends Controller
@@ -41,6 +43,16 @@ class VolunteerController extends Controller
         $volunteers = $query->latest()->paginate(10);
 
         return view('admin.volunteer-index', compact('volunteers'));
+        $jumlahPendaftar = Pendaftaran::where('kegiatan_id', $kegiatan->id_kegiatan)->count();
+
+        $sudahDaftar = false;
+        if (Auth::check()) {
+            $sudahDaftar = Pendaftaran::where('kegiatan_id', $kegiatan->id_kegiatan)
+                ->where('user_id', Auth::id())
+                ->exists();
+        }
+
+        return view('volunteer.detail', compact('kegiatan', 'jumlahPendaftar', 'sudahDaftar'));
     }
 
     public function adminStore(Request $request)

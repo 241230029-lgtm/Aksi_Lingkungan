@@ -8,17 +8,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Kegiatan extends Model
 {
-    // Nama tabel
     protected $table = 'kegiatans';
-
-    // Primary key sesuai migration
     protected $primaryKey = 'id_kegiatan';
-
-    // Primary key bertipe integer dan auto increment
     public $incrementing = true;
     protected $keyType = 'int';
 
-    // Kolom yang boleh diisi
     protected $fillable = [
         'user_id',
         'judul',
@@ -32,21 +26,33 @@ class Kegiatan extends Model
         'status',
     ];
 
-    /**
-     * Relasi ke User
-     * Satu kegiatan dimiliki oleh satu user.
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    /**
-     * Relasi ke Pendaftaran
-     * Satu kegiatan memiliki banyak pendaftaran relawan.
-     */
     public function pendaftarans(): HasMany
     {
         return $this->hasMany(Pendaftaran::class, 'kegiatan_id', 'id_kegiatan');
+    }
+
+    public function detailRoute()
+    {
+        return match($this->kategori) {
+            'Eco-Volunteer' => route('volunteer.show', $this->id_kegiatan),
+            'Eco-Sharing' => route('sharing.show', $this->id_kegiatan),
+            'Eco-Information' => route('information.show', $this->id_kegiatan),
+            default => '#',
+        };
+    }
+
+    public function getKategoriLabelAttribute()
+    {
+        return match($this->kategori) {
+            'Eco-Volunteer' => 'Relawan',
+            'Eco-Sharing' => 'Sharing',
+            'Eco-Information' => 'Informasi',
+            default => $this->kategori,
+        };
     }
 }
