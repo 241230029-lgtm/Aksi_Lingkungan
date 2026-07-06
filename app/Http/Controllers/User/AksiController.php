@@ -4,6 +4,8 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kegiatan;
+use App\Models\Sharing;
+use App\Models\Information;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,29 +17,58 @@ class AksiController extends Controller
         return view('create-aksi');
     }
 
-    // Menyimpan data ke database
+    // Menyimpan data ke tabel yang sesuai dengan kategori yang dipilih
     public function store(Request $request)
     {
         $request->validate([
-            'judul'           => 'required|string|max:255',
-            'kategori'        => 'required|in:Eco-Sharing,Eco-Information,Eco-Volunteer',
-            'lokasi'          => 'required|string|max:255',
-            'tanggal_kejadian'=> 'nullable|date',
-            'deskripsi'       => 'required|string',
-            'gambar'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'judul'            => 'required|string|max:255',
+            'kategori'         => 'required|in:Eco-Sharing,Eco-Information,Eco-Volunteer',
+            'lokasi'           => 'required_if:kategori,Eco-Volunteer|nullable|string|max:255',
+            'tanggal_kejadian' => 'nullable|date',
+            'deskripsi'        => 'required|string',
+            'gambar'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $data = $request->only(['judul', 'kategori', 'lokasi', 'tanggal_kejadian', 'deskripsi']);
+        $namaPengguna = auth()->user()->name ?? 'Masyarakat';
 
-        // Set user_id sesuai yang login, dan status otomatis aktif
-        $data['user_id'] = auth()->id();
-        $data['status'] = 'aktif';
+        switch ($request->kategori) {
 
-        if ($request->hasFile('gambar')) {
-            $data['gambar'] = $request->file('gambar')->store('kegiatan', 'public');
+            case 'Eco-Sharing':
+                Sharing::create([
+                    'judul'     => $request->judul,
+                    'kategori'  => $request->kategori,
+                    'deskripsi' => $request->deskripsi,
+                    'pembuat'   => $namaPengguna,
+                ]);
+                break;
+
+            case 'Eco-Information':
+                $gambarPath = null;
+                if ($request->hasFile('gambar')) {
+                    $gambarPath = $request->file('gambar')->store('information', 'public');
+                }
+
+                Information::create([
+                    'judul'    => $request->judul,
+                    'kategori' => $request->kategori,
+                    'konten'   => $request->deskripsi,
+                    'penulis'  => $namaPengguna,
+                    'gambar'   => $gambarPath,
+                ]);
+                break;
+
+            default: // Eco-Volunteer
+                $data = $request->only(['judul', 'kategori', 'lokasi', 'tanggal_kejadian', 'deskripsi']);
+                $data['user_id'] = auth()->id();
+                $data['status'] = 'aktif';
+
+                if ($request->hasFile('gambar')) {
+                    $data['gambar'] = $request->file('gambar')->store('kegiatan', 'public');
+                }
+
+                Kegiatan::create($data);
+                break;
         }
-
-        Kegiatan::create($data);
 
         return redirect()->route('katalog')->with('success', 'Aksi lingkungan kamu berhasil dipublikasikan!');
     }

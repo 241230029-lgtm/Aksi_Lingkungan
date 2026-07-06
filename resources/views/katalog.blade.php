@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
 
@@ -57,12 +57,14 @@
             <p class="text-gray-500 mt-3 flex-1">{{ Str::limit($item->deskripsi, 100) }}</p>
 
             <div class="border-t border-gray-100 mt-4 pt-4">
-                <p class="text-sm font-semibold text-gray-700 mb-3">Dibuat oleh: <span class="text-green-600">{{ $item->user->name ?? 'Administrator' }}</span></p>
+                <p class="text-sm font-semibold text-gray-700 mb-3">Dibuat oleh: <span class="text-green-600">{{ $item->pembuat }}</span></p>
                 <div class="flex justify-between items-center">
                     <div>
+                        @if($item->lokasi)
                         <p class="text-sm text-gray-500">📍 {{ $item->lokasi }}</p>
+                        @endif
                     </div>
-                    <a href="{{ $item->detailRoute() }}" class="bg-green-600 text-white px-5 py-2 rounded-xl hover:bg-green-700">Detail</a>
+                    <a href="{{ route('katalog.show', ['tipe' => $item->tipe, 'id' => $item->id]) }}" class="bg-green-600 text-white px-5 py-2 rounded-xl hover:bg-green-700">Detail</a>
                 </div>
             </div>
         </div>

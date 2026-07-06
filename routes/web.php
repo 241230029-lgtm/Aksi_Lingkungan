@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use Illuminate\Support\Facades\Route;
 
@@ -22,7 +22,7 @@ use App\Http\Controllers\Admin\AdminUserController;
 */
 Route::view('/', 'home')->name('home');
 Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog');
-Route::get('/katalog/{id}', [KatalogController::class, 'show'])->name('katalog.show');
+Route::get('/katalog/{tipe}/{id}', [KatalogController::class, 'show'])->name('katalog.show');
 Route::view('/tentang', 'about')->name('tentang');
 
 // ROUTE BIKIN AKSI USER
@@ -63,6 +63,7 @@ Route::post('/volunteer/{id}/daftar', [PendaftaranVolunteerController::class, 's
 Route::get('/sharing', [SharingController::class, 'index'])->name('sharing.index');
 
 Route::get('/information', [InformationController::class, 'index'])->name('information.index');
+Route::get('/information/{id}', [InformationController::class, 'show'])->name('information.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -88,7 +89,7 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::delete('/kegiatan/{id}', [AdminKegiatanController::class, 'destroy'])->name('kegiatan.destroy');
 
     // Manajemen Informasi
-    Route::get('/information', [InformationController::class, 'index'])->name('information');
+    Route::get('/information', [InformationController::class, 'adminIndex'])->name('information');
     Route::post('/information/store', [InformationController::class, 'store'])->name('information.store');
     Route::put('/information/update/{id}', [InformationController::class, 'update'])->name('information.update');
     Route::delete('/information/{id}', [InformationController::class, 'destroy'])->name('information.destroy');
