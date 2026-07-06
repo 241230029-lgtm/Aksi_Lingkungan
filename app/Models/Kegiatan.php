@@ -26,9 +26,9 @@ class Kegiatan extends Model
         'status',
     ];
 
-    public function user(): BelongsTo
+    public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
 
     public function pendaftarans(): HasMany
@@ -38,12 +38,8 @@ class Kegiatan extends Model
 
     public function detailRoute()
     {
-        return match($this->kategori) {
-            'Eco-Volunteer' => route('volunteer.show', $this->id_kegiatan),
-            'Eco-Sharing' => route('sharing.show', $this->id_kegiatan),
-            'Eco-Information' => route('information.show', $this->id_kegiatan),
-            default => '#',
-        };
+        // SEMUA detail diarahkan ke 1 route katalog
+        return route('katalog.show', $this->id_kegiatan);
     }
 
     public function getKategoriLabelAttribute()

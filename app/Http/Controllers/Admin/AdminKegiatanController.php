@@ -44,7 +44,7 @@ class AdminKegiatanController extends Controller
         ]);
 
         // TAMBAHKAN INI: Set user_id default karena admin login manual
-        $data['user_id'] = 1;
+            $data['user_id'] = auth()->id();
 
         if ($request->hasFile('gambar')) {
             $data['gambar'] = $request->file('gambar')->store('kegiatan', 'public');

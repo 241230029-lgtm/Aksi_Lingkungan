@@ -8,33 +8,19 @@
 
         <!-- Bagian Kiri -->
         <div class="bg-green-600 text-white p-10 flex flex-col justify-center">
-
-            <h1 class="text-4xl font-bold mb-4">
-                Selamat Datang 👋
-            </h1>
-
+            <h1 class="text-4xl font-bold mb-4">Selamat Datang 👋</h1>
             <p class="text-green-100 leading-8">
                 Masuk untuk mengakses Dashboard Aksi Lingkungan dan ikut berkontribusi menjaga lingkungan.
             </p>
-
-            <img
-                src="https://images.unsplash.com/photo-1492496913980-501348b61469?w=900"
-                alt="Aksi Lingkungan"
-                class="mt-10 rounded-2xl object-cover h-72">
-
+            <img src="https://images.unsplash.com/photo-1492496913980-501348b61469?w=900" alt="Aksi Lingkungan" class="mt-10 rounded-2xl object-cover h-72">
         </div>
 
         <!-- Bagian Kanan -->
         <div class="p-10 flex flex-col justify-center">
-
-            <h2 class="text-3xl font-bold text-center text-green-700 mb-8">
-                Login
-            </h2>
+            <h2 class="text-3xl font-bold text-center text-green-700 mb-8">Login</h2>
 
             @if(session('success'))
-                <div class="mb-5 p-4 bg-green-100 text-green-700 rounded-xl">
-                    {{ session('success') }}
-                </div>
+                <div class="mb-5 p-4 bg-green-100 text-green-700 rounded-xl">{{ session('success') }}</div>
             @endif
 
             @if($errors->any())
@@ -46,32 +32,23 @@
             <form method="POST" action="{{ route('login.process') }}">
                 @csrf
 
-                <!-- Email -->
+                <!-- NAMA PENGGUNA (BUKAN EMAIL) -->
                 <div class="mb-5">
-
-                    <label for="email" class="block font-semibold mb-2">
-                        Email
-                    </label>
-
+                    <label for="name" class="block font-semibold mb-2">Nama Pengguna</label>
                     <input
-                        id="email"
-                        type="email"
-                        name="email"
-                        value="{{ old('email') }}"
+                        id="name"
+                        type="text"
+                        name="name"
+                        value="{{ old('name') }}"
                         required
                         autofocus
-                        placeholder="Masukkan email"
+                        placeholder="Masukkan nama pengguna"
                         class="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500">
-
                 </div>
 
-                <!-- Password -->
+                <!-- PASSWORD -->
                 <div class="mb-5">
-
-                    <label for="password" class="block font-semibold mb-2">
-                        Password
-                    </label>
-
+                    <label for="password" class="block font-semibold mb-2">Password</label>
                     <input
                         id="password"
                         type="password"
@@ -79,57 +56,26 @@
                         required
                         placeholder="Masukkan password"
                         class="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500">
-
                 </div>
 
-                <!-- Remember Me -->
                 <div class="flex items-center justify-between mb-6">
-
                     <label class="flex items-center">
-
-                        <input
-                            type="checkbox"
-                            name="remember"
-                            class="mr-2">
-
-                        Ingat Saya
-
+                        <input type="checkbox" name="remember" class="mr-2"> Ingat Saya
                     </label>
-
-                    <a href="#" class="text-green-600 hover:underline">
-                        Lupa Password?
-                    </a>
-
+                    <a href="#" class="text-green-600 hover:underline">Lupa Password?</a>
                 </div>
 
-                <!-- Tombol Login -->
-                <button
-                    type="submit"
-                    class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl transition">
-
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl transition font-semibold">
                     Login
-
                 </button>
-
             </form>
 
             <p class="text-center mt-6">
-
                 Belum punya akun?
-
-                <a href="{{ route('register') }}"
-                    class="text-green-600 font-semibold hover:underline">
-
-                    Register
-
-                </a>
-
+                <a href="#" onclick="window.location.href='{{ route('home') }}'; setTimeout(()=>openRegisterModal(), 500);" class="text-green-600 font-semibold hover:underline">Register</a>
             </p>
-
         </div>
-
     </div>
-
 </div>
 
 @endsection

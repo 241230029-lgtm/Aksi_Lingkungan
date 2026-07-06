@@ -2,6 +2,13 @@
 
 @section('content')
 
+{{-- Notifikasi Sukses Buat Aksi --}}
+@if(session('success'))
+<div class="bg-green-100 text-green-700 py-4 text-center font-semibold">
+    {{ session('success') }}
+</div>
+@endif
+
 <section class="bg-green-600 text-white py-16">
     <div class="max-w-7xl mx-auto px-6">
         <h1 class="text-5xl font-bold">Katalog Aksi Lingkungan</h1>
@@ -42,18 +49,21 @@
 @else
 <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-8">
     @foreach($items as $item)
-    <div class="bg-white rounded-2xl shadow hover:shadow-xl transition overflow-hidden">
+    <div class="bg-white rounded-2xl shadow hover:shadow-xl transition overflow-hidden flex flex-col">
         <img src="{{ $item->gambar ? asset('storage/' . $item->gambar) : 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=900' }}" class="h-60 w-full object-cover">
-        <div class="p-6">
-            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">{{ $item->kategori_label }}</span>
+        <div class="p-6 flex flex-col flex-1">
+            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm w-fit">{{ $item->kategori_label }}</span>
             <h2 class="text-2xl font-bold mt-4">{{ $item->judul }}</h2>
-            <p class="text-gray-500 mt-3">{{ Str::limit($item->deskripsi, 100) }}</p>
-            <div class="flex justify-between items-center mt-6">
-                <div>
-                    <p class="text-sm text-gray-500">📍 {{ $item->lokasi }}</p>
-                    <p class="text-sm text-gray-500">📅 {{ $item->created_at->format('d M Y') }}</p>
+            <p class="text-gray-500 mt-3 flex-1">{{ Str::limit($item->deskripsi, 100) }}</p>
+
+            <div class="border-t border-gray-100 mt-4 pt-4">
+                <p class="text-sm font-semibold text-gray-700 mb-3">Dibuat oleh: <span class="text-green-600">{{ $item->user->name ?? 'Administrator' }}</span></p>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-gray-500">📍 {{ $item->lokasi }}</p>
+                    </div>
+                    <a href="{{ $item->detailRoute() }}" class="bg-green-600 text-white px-5 py-2 rounded-xl hover:bg-green-700">Detail</a>
                 </div>
-                <a href="{{ $item->detailRoute() }}" class="bg-green-600 text-white px-5 py-2 rounded-xl hover:bg-green-700">Detail</a>
             </div>
         </div>
     </div>

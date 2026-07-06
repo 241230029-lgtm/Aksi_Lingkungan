@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\User\AuthController;
 use App\Http\Controllers\User\DashboardController;
+use App\Http\Controllers\User\AksiController;
 use App\Http\Controllers\Volunteer\VolunteerController;
 use App\Http\Controllers\Volunteer\PendaftaranVolunteerController;
 use App\Http\Controllers\Sharing\SharingController;
@@ -21,8 +22,12 @@ use App\Http\Controllers\Admin\AdminUserController;
 */
 Route::view('/', 'home')->name('home');
 Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog');
-Route::view('/buat-aksi', 'create-aksi')->name('buat-aksi');
+Route::get('/katalog/{id}', [KatalogController::class, 'show'])->name('katalog.show');
 Route::view('/tentang', 'about')->name('tentang');
+
+// ROUTE BIKIN AKSI USER
+Route::get('/buat-aksi', [AksiController::class, 'create'])->name('buat-aksi');
+Route::post('/buat-aksi', [AksiController::class, 'store'])->name('user.aksi.store');
 
 Route::view('/profil', 'profile')->name('profil');
 Route::view('/profil/aktivitas', 'user.aktivitas')->name('aktivitas');
@@ -53,14 +58,11 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 |--------------------------------------------------------------------------
 */
 Route::get('/volunteer', [VolunteerController::class, 'index'])->name('volunteer.index');
-Route::get('/volunteer/{id}', [VolunteerController::class, 'show'])->name('volunteer.show');
 Route::post('/volunteer/{id}/daftar', [PendaftaranVolunteerController::class, 'store'])->name('volunteer.daftar');
 
 Route::get('/sharing', [SharingController::class, 'index'])->name('sharing.index');
-Route::get('/sharing/{id}', [SharingController::class, 'show'])->name('sharing.show');
 
 Route::get('/information', [InformationController::class, 'index'])->name('information.index');
-Route::get('/information/{id}', [InformationController::class, 'show'])->name('information.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -76,6 +78,7 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::get('/users', [AdminUserController::class, 'index'])->name('users');
     Route::post('/users/store', [AdminUserController::class, 'store'])->name('users.store');
     Route::put('/users/update/{id}', [AdminUserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 
     // Manajemen Kegiatan
     Route::get('/kegiatan', [AdminKegiatanController::class, 'index'])->name('kegiatan');
