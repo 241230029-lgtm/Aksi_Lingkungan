@@ -34,7 +34,7 @@
                     <th class="p-4 px-6">Judul Topik</th>
                     <th class="p-4 px-6">Kategori</th>
                     <th class="p-4 px-6">Oleh (Pembuat)</th>
-                    <th class="p-4 px-6">Tanggal Dibuat</th>
+                    <th class="p-4 px-6">Tanggal</th>
                     <th class="p-4 px-6 text-center w-28">Aksi</th>
                 </tr>
             </thead>
@@ -48,7 +48,9 @@
                                 <span class="bg-blue-50 text-blue-700 border border-blue-100 px-2.5 py-0.5 rounded-md text-xs font-semibold">{{ $item->kategori }}</span>
                             </td>
                             <td class="p-4 px-6 text-gray-600">{{ $item->pembuat }}</td>
-                            <td class="p-4 px-6 text-xs text-gray-400">{{ $item->created_at->translatedFormat('d M Y') }}</td>
+                            <td class="p-4 px-6 text-xs text-gray-400">
+                                {{ $item->tanggal ? \Carbon\Carbon::parse($item->tanggal)->translatedFormat('d M Y') : $item->created_at->translatedFormat('d M Y') }}
+                            </td>
                             <td class="p-4 px-6 text-center flex items-center justify-center gap-2 mt-2">
                                 <button onclick="openEditModal({{ json_encode($item) }})" class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition cursor-pointer">
                                     Edit
@@ -70,17 +72,28 @@
 </div>
 
 <div id="modalTambahSharing" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl relative">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl relative my-auto">
         <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
             <h3 class="text-xl font-bold text-gray-900">Form Tambah Topik Sharing</h3>
             <button onclick="closeModal('modalTambahSharing')" class="text-gray-400 hover:text-gray-600 cursor-pointer">✕</button>
         </div>
-        <form action="{{ route('admin.sharing.store') }}" method="POST" class="space-y-4">
+        <form action="{{ route('admin.sharing.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
             <div>
                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Judul Topik / Diskusi</label>
                 <input type="text" name="judul" required placeholder="Contoh: Pengalaman Mengurangi Kantong Plastik..." class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm">
             </div>
+            
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Hubungkan ke Kegiatan</label>
+                <select name="kegiatan_id" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm">
+                    <option value="">-- Pilih Kegiatan --</option>
+                    @foreach($kegiatans as $kegiatan)
+                        <option value="{{ $kegiatan->id }}">{{ $kegiatan->nama_kegiatan }}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Kategori</label>
@@ -95,10 +108,27 @@
                     <input type="text" name="pembuat" value="Admin" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm">
                 </div>
             </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tanggal</label>
+                <input type="date" name="tanggal" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Upload Gambar Sampul</label>
+                <input type="file" name="gambar" accept="image/*" class="w-full px-4 py-1.5 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm bg-gray-50">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Upload File Lampiran (PDF/Docx)</label>
+                <input type="file" name="file" class="w-full px-4 py-1.5 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm bg-gray-50">
+            </div>
+
             <div>
                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Isi Cerita / Deskripsi Diskusi</label>
-                <textarea name="deskripsi" required rows="4" placeholder="Tulis rincian cerita pengalamannya di sini..." class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm"></textarea>
+                <textarea name="deskripsi" required rows="3" placeholder="Tulis rincian cerita pengalamannya di sini..." class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm"></textarea>
             </div>
+            
             <div class="pt-4 border-t border-gray-100 flex justify-end gap-2">
                 <button type="button" onclick="closeModal('modalTambahSharing')" class="px-4 py-2 text-sm text-gray-500 rounded-xl hover:bg-gray-50">Batal</button>
                 <button type="submit" class="px-4 py-2 text-sm text-white bg-green-600 rounded-xl font-semibold hover:bg-green-700">Simpan Topik</button>
@@ -108,18 +138,29 @@
 </div>
 
 <div id="modalEditSharing" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl relative">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl relative my-auto">
         <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
             <h3 class="text-xl font-bold text-gray-900">Form Edit Topik Sharing</h3>
             <button onclick="closeModal('modalEditSharing')" class="text-gray-400 hover:text-gray-600 cursor-pointer">✕</button>
         </div>
-        <form id="editSharingForm" method="POST" class="space-y-4">
+        <form id="editSharingForm" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
             @method('PUT')
             <div>
                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Judul Topik / Diskusi</label>
                 <input type="text" id="edit_judul" name="judul" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
             </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Hubungkan ke Kegiatan</label>
+                <select id="edit_kegiatan_id" name="kegiatan_id" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
+                    <option value="">-- Pilih Kegiatan --</option>
+                    @foreach($kegiatans as $kegiatan)
+                        <option value="{{ $kegiatan->id }}">{{ $kegiatan->nama_kegiatan }}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Kategori</label>
@@ -134,9 +175,25 @@
                     <input type="text" id="edit_pembuat" name="pembuat" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
                 </div>
             </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tanggal</label>
+                <input type="date" id="edit_tanggal" name="tanggal" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Ganti Gambar Sampul</label>
+                <input type="file" name="gambar" accept="image/*" class="w-full px-4 py-1.5 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm bg-gray-50">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Ganti File Lampiran (PDF/Docx)</label>
+                <input type="file" name="file" class="w-full px-4 py-1.5 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm bg-gray-50">
+            </div>
+
             <div>
                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Isi Cerita / Deskripsi Diskusi</label>
-                <textarea id="edit_deskripsi" name="deskripsi" required rows="4" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm"></textarea>
+                <textarea id="edit_deskripsi" name="deskripsi" required rows="3" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm"></textarea>
             </div>
             <div class="pt-4 border-t border-gray-100 flex justify-end gap-2">
                 <button type="button" onclick="closeModal('modalEditSharing')" class="px-4 py-2 text-sm text-gray-500 rounded-xl hover:bg-gray-50">Batal</button>
@@ -166,6 +223,11 @@
         document.getElementById('edit_kategori').value = data.kategori;
         document.getElementById('edit_pembuat').value = data.pembuat;
         document.getElementById('edit_deskripsi').value = data.deskripsi;
+        
+        // Update JavaScript: Mengisi otomatis data kegiatan lama & tanggal lama ke form edit
+        document.getElementById('edit_kegiatan_id').value = data.kegiatan_id || '';
+        document.getElementById('edit_tanggal').value = data.tanggal || '';
+        
         openModal('modalEditSharing');
     }
     function triggerDelete(id) {

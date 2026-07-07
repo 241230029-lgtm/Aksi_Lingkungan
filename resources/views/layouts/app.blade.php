@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< HEAD
     <title>Platform Aksi Lingkungan</title>
 
     @vite(['resources/css/app.css','resources/js/app.js'])
@@ -22,7 +21,7 @@
             <li><a href="#">Tentang</a></li>
         </ul>
     </nav>
-=======
+
     <title>{{ config('app.name', 'Aksi Lingkungan') }}</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -31,16 +30,12 @@
 <body class="bg-gray-50 text-gray-800">
 
     @include('layouts.partials.navbar')
->>>>>>> main
 
     <main>
         @yield('content')
     </main>
 
-<<<<<<< HEAD
-=======
     @include('layouts.partials.footer')
 
->>>>>>> main
 </body>
 </html>
