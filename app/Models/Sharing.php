@@ -12,5 +12,5 @@ class Sharing extends Model
     // Paksa model menggunakan nama tabel tunggal/jamak yang sesuai di database
     protected $table = 'sharings';
 
-    protected $fillable = ['judul', 'kategori', 'deskripsi', 'pembuat'];
+    protected $fillable = ['judul', 'kategori', 'deskripsi', 'pembuat', 'gambar', 'file'];
 }

@@ -152,8 +152,7 @@
 
                         <p class="text-xs text-gray-500">
 
-                            {{ session('role') == 'admin' ? 'Administrator' : 'Masyarakat' }}
-
+{{ auth()->check() ? auth()->user()->name : 'Pengguna' }}
                         </p>
 
                     </div>

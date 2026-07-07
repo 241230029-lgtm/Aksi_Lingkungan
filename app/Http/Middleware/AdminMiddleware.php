@@ -10,10 +10,13 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
-            return redirect('/')->with('error', 'Akses ditolak. Hanya admin yang diizinkan.');
+        // WAJIB pakai Auth::check(), bukan Session::get('login')
+        if (Auth::check() && Auth::user()->role === 'admin') {
+            return $next($request);
         }
 
-        return $next($request);
+        return redirect()->route('login')->withErrors([
+            'login' => 'Anda tidak memiliki akses ke panel Admin.',
+        ]);
     }
 }

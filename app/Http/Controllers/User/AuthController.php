@@ -4,88 +4,77 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class AuthController extends Controller
 {
-    /**
-     * Menampilkan halaman register.
-     * (Sementara tidak digunakan pada mode demo)
-     */
     public function showRegister()
     {
         return view('auth.register');
     }
 
-    /**
-     * Register dinonaktifkan sementara.
-     */
     public function register(Request $request)
     {
-        return redirect()->back()->with(
-            'error',
-            'Registrasi dinonaktifkan pada mode demo.'
-        );
+        $request->validate([
+            'name'     => 'required|string|max:255|unique:users,name',
+            'password' => 'required|string|min:4|confirmed',
+        ]);
+
+        User::create([
+            'name'     => trim($request->name),
+            'email'    => trim($request->name) . '@aksilingkungan.com',
+            'password' => Hash::make(trim($request->password)),
+            'role'     => 'user',
+        ]);
+
+        return redirect()->route('home')->with('success', 'Registrasi berhasil! Silakan login.');
     }
 
-    /**
-     * Menampilkan halaman login.
-     */
     public function showLogin()
     {
         return view('auth.login');
     }
 
-    /**
-     * Login Demo.
-     */
     public function login(Request $request)
     {
-        $request->validate([
-            'username' => 'required|string',
-            'password' => 'required|string',
-        ]);
+        // TRIM: Menghapus spasi di awal dan akhir teks
+        $username = trim($request->input('name') ?? $request->input('username') ?? $request->input('email') ?? '');
+        $password = trim($request->input('password') ?? '');
 
-        $username = strtolower(trim($request->username));
-        $password = $request->password;
-
-        // ===========================
-        // LOGIN ADMIN
-        // ===========================
-
-        if ($username === 'admin' && $password === 'admin123') {
-
-            Session::put('login', true);
-            Session::put('role', 'admin');
-            Session::put('name', 'Administrator');
-
-            return redirect()->route('admin.dashboard');
+        if (!$username || !$password) {
+            return redirect()->route('home')->withErrors(['login' => 'Nama pengguna dan password wajib diisi.']);
         }
 
-        // ===========================
-        // LOGIN MASYARAKAT
-        // ===========================
-
-        if ($username === 'masyarakat' && $password === 'masyarakat123') {
-
-            Session::put('login', true);
-            Session::put('role', 'user');
-            Session::put('name', 'Masyarakat');
-
+        // METODE 1: Pakai Auth::attempt (Paling Tangguh)
+        // Coba cek sebagai NAMA
+        if (Auth::attempt(['name' => $username, 'password' => $password])) {
+            $request->session()->regenerate();
+            if (Auth::user()->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
             return redirect()->route('dashboard');
         }
 
-        return back()->withErrors([
-            'login' => 'Pengguna atau password salah.',
-        ]);
+        // Coba cek sebagai EMAIL (Sebagai Cadangan)
+        if (Auth::attempt(['email' => $username, 'password' => $password])) {
+            $request->session()->regenerate();
+            if (Auth::user()->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
+            return redirect()->route('dashboard');
+        }
+
+        // Jika semua gagal
+        return redirect()->route('home')->withErrors(['login' => 'Nama pengguna atau password salah.']);
     }
 
-    /**
-     * Logout.
-     */
     public function logout(Request $request)
     {
-        Session::flush();
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return redirect()->route('home');
     }

@@ -10,9 +10,35 @@ use Illuminate\Support\Facades\Storage;
 class InformationController extends Controller
 {
     /**
-     * Menampilkan daftar artikel informasi
+     * PUBLIK: Menampilkan daftar artikel informasi untuk masyarakat
      */
     public function index(Request $request)
+    {
+        $query = Information::query();
+
+        if ($request->filled('search')) {
+            $query->where('judul', 'like', '%' . $request->search . '%');
+        }
+
+        $informations = $query->latest()->get();
+
+        return view('information.index', compact('informations'));
+    }
+
+    /**
+     * PUBLIK: Menampilkan detail satu artikel informasi
+     */
+    public function show($id)
+    {
+        $information = Information::findOrFail($id);
+
+        return view('information.detail', compact('information'));
+    }
+
+    /**
+     * ADMIN: Menampilkan daftar artikel informasi di panel admin
+     */
+    public function adminIndex(Request $request)
     {
         $query = Information::query();
 
