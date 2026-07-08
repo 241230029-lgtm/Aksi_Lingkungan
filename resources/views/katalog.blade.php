@@ -8,9 +8,9 @@
 @endif
 
 <section class="bg-gradient-to-br from-green-600 to-green-700 text-white py-20">
-    <div class="max-w-7xl mx-auto px-6">
+    <div class="max-w-4xl mx-auto px-6 text-center">
         <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">Katalog Aksi Lingkungan</h1>
-        <p class="mt-4 text-lg text-green-100 max-w-xl">Temukan berbagai aksi relawan, informasi edukasi, dan barang yang dibagikan untuk lingkungan yang lebih baik.</p>
+        <p class="mt-4 text-lg text-green-100 max-w-2xl mx-auto">Temukan berbagai aksi relawan, informasi edukasi, dan barang yang dibagikan untuk lingkungan yang lebih baik.</p>
     </div>
 </section>
 
