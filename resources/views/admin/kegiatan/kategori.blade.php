@@ -2,6 +2,25 @@
 
 @section('content')
 
+@php
+    $tema = match($kategori) {
+        'Eco-Volunteer' => ['badge' => 'bg-amber-50 text-amber-700 border-amber-100', 'btn' => 'bg-amber-600 hover:bg-amber-700', 'ring' => 'focus:border-amber-500', 'icon' => 'text-amber-600 bg-amber-50'],
+        'Eco-Sharing' => ['badge' => 'bg-purple-50 text-purple-700 border-purple-100', 'btn' => 'bg-purple-600 hover:bg-purple-700', 'ring' => 'focus:border-purple-500', 'icon' => 'text-purple-600 bg-purple-50'],
+        default => ['badge' => 'bg-blue-50 text-blue-700 border-blue-100', 'btn' => 'bg-blue-600 hover:bg-blue-700', 'ring' => 'focus:border-blue-500', 'icon' => 'text-blue-600 bg-blue-50'],
+    };
+@endphp
+
+@if ($errors->any())
+<div class="mb-5 p-4 bg-red-50 border border-red-200 text-red-700 rounded-2xl text-sm shadow-sm">
+    <p class="font-bold mb-1">Data gagal disimpan, periksa kembali:</p>
+    <ul class="list-disc list-inside">
+        @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
+
 @if(session('success'))
 <div class="mb-5 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl flex items-center gap-2 text-sm shadow-sm">
     <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -14,7 +33,13 @@
         <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Manajemen {{ $kategori }}</h1>
         <p class="text-sm text-gray-500 mt-1">Kelola data {{ strtolower($kategori) }} yang masuk ke Katalog pengguna.</p>
     </div>
-    <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition shadow-sm cursor-pointer">+ Tambah {{ $kategori }}</button>
+    <div class="flex items-center gap-3">
+        <form method="GET" class="relative">
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari judul..." class="pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none {{ $tema['ring'] }} w-56 shadow-sm">
+            <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </form>
+        <button onclick="openModal()" class="{{ $tema['btn'] }} text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition shadow-sm cursor-pointer whitespace-nowrap">+ Tambah {{ $kategori }}</button>
+    </div>
 </div>
 
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -30,9 +55,12 @@
             </thead>
             <tbody class="divide-y divide-gray-100 text-gray-700">
                 @forelse($items as $item)
-                <tr class="hover:bg-gray-50/40 transition">
+                <tr class="hover:bg-gray-50/60 transition">
                     <td class="p-4 px-6 font-bold text-gray-900">{{ $item->judul }}</td>
-                    <td class="p-4 px-6 text-gray-500">{{ $item->lokasi }}</td>
+                    <td class="p-4 px-6 text-gray-500 flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        {{ $item->lokasi }}
+                    </td>
                     <td class="p-4 px-6">
                         <span class="px-2.5 py-1 rounded-full text-xs font-semibold border {{ $item->status == 'Aktif' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-gray-100 text-gray-600 border-gray-200' }}">
                             {{ $item->status }}
@@ -48,7 +76,12 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="4" class="p-8 text-center text-gray-400 italic">Belum ada data.</td></tr>
+                <tr>
+                    <td colspan="4" class="p-14 text-center text-gray-400">
+                        <svg class="w-10 h-10 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-6 4h6m2 4H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <p class="italic">Belum ada data.</p>
+                    </td>
+                </tr>
                 @endforelse
             </tbody>
         </table>
@@ -59,73 +92,73 @@
 </div>
 
 {{-- MODAL TAMBAH & EDIT --}}
-<div id="modal" style="display:none; position:fixed; inset:0; z-index:50; background-color:rgba(0,0,0,0.6); align-items:center; justify-content:center; padding:1rem; overflow-y:auto;">
-    <div style="background-color:white; border-radius:1.5rem; max-width:32rem; width:100%; padding:2rem; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); margin:auto; position:relative;">
-        <button onclick="closeModal()" style="position:absolute; top:1rem; right:1.5rem; background:none; border:none; cursor:pointer; color:#9ca3af;">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+<div id="modal" class="hidden fixed inset-0 z-50 items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-7 shadow-2xl relative m-auto">
+        <button onclick="closeModal()" class="absolute top-4 right-5 text-gray-400 hover:text-gray-600 cursor-pointer transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
-        <h3 id="modalTitle" style="font-size:1.25rem; font-weight:700; color:#111827;" class="mb-6"></h3>
+        <h3 id="modalTitle" class="text-lg font-bold text-gray-900 mb-6 pb-3 border-b border-gray-100"></h3>
 
-        <form id="mainForm" method="POST" enctype="multipart/form-data">
+        <form id="mainForm" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
             <input type="hidden" name="_method" value="POST">
             <input type="hidden" name="kategori" value="{{ $kategori }}">
 
-            <div style="display:grid; gap:1rem;">
+            <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label style="display:block; font-size:0.75rem; font-weight:700; color:#9ca3af; text-transform:uppercase; margin-bottom:0.25rem;">Judul</label>
-                    <input type="text" name="judul" id="f_judul" required class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Judul</label>
+                    <input type="text" name="judul" id="f_judul" required class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none {{ $tema['ring'] }}">
                 </div>
                 <div>
-                    <label style="display:block; font-size:0.75rem; font-weight:700; color:#9ca3af; text-transform:uppercase; margin-bottom:0.25rem;">Lokasi</label>
-                    <input type="text" name="lokasi" id="f_lokasi" required class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500">
-                </div>
-            </div>
-
-            <div id="fieldVolunteer" style="display:none; margin-top:1rem; display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-                <div>
-                    <label style="display:block; font-size:0.75rem; font-weight:700; color:#9ca3af; text-transform:uppercase; margin-bottom:0.25rem;">Tanggal</label>
-                    <input type="date" name="tanggal_kejadian" id="f_tanggal" class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500">
-                </div>
-                <div>
-                    <label style="display:block; font-size:0.75rem; font-weight:700; color:#9ca3af; text-transform:uppercase; margin-bottom:0.25rem;">Kuota Relawan</label>
-                    <input type="number" name="kuota_relawan" id="f_kuota" min="1" class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Lokasi</label>
+                    <input type="text" name="lokasi" id="f_lokasi" required class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none {{ $tema['ring'] }}">
                 </div>
             </div>
 
-            <div id="fieldSharing" style="display:none; margin-top:1rem;">
-                <label style="display:block; font-size:0.75rem; font-weight:700; color:#9ca3af; text-transform:uppercase; margin-bottom:0.25rem;">Link WhatsApp</label>
-                <input type="text" name="link_kontak" id="f_link" placeholder="https://wa.me/..." class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500">
-            </div>
-
-            <div style="margin-top:1rem;">
-                <label style="display:block; font-size:0.75rem; font-weight:700; color:#9ca3af; text-transform:uppercase; margin-bottom:0.25rem;">Deskripsi</label>
-                <textarea name="deskripsi" id="f_deskripsi" required rows="3" class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500"></textarea>
-            </div>
-
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1rem;">
+            <div id="fieldVolunteer" class="hidden grid grid-cols-2 gap-4">
                 <div>
-                    <label style="display:block; font-size:0.75rem; font-weight:700; color:#9ca3af; text-transform:uppercase; margin-bottom:0.25rem;">Gambar</label>
-                    <input type="file" name="gambar" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tanggal</label>
+                    <input type="date" name="tanggal_kejadian" id="f_tanggal" class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none {{ $tema['ring'] }}">
                 </div>
                 <div>
-                    <label style="display:block; font-size:0.75rem; font-weight:700; color:#9ca3af; text-transform:uppercase; margin-bottom:0.25rem;">Status</label>
-                    <select name="status" id="f_status" required class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Kuota Relawan</label>
+                    <input type="number" name="kuota_relawan" id="f_kuota" min="1" class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none {{ $tema['ring'] }}">
+                </div>
+            </div>
+
+            <div id="fieldSharing" class="hidden">
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Link WhatsApp</label>
+                <input type="text" name="link_kontak" id="f_link" placeholder="https://wa.me/..." class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none {{ $tema['ring'] }}">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Deskripsi</label>
+                <textarea name="deskripsi" id="f_deskripsi" required rows="3" class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none {{ $tema['ring'] }}"></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Gambar</label>
+                    <input type="file" name="gambar" accept="image/*" class="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold {{ $tema['icon'] }}">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Status</label>
+                    <select name="status" id="f_status" required class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none {{ $tema['ring'] }}">
                         <option value="Aktif">Aktif</option>
                         <option value="Selesai">Selesai</option>
                     </select>
                 </div>
             </div>
 
-            <div style="margin-top:1.5rem; display:flex; justify-content:flex-end; gap:0.75rem; border-top:1px solid #f3f4f6; padding-top:1rem;">
+            <div class="flex justify-end gap-2 border-t border-gray-100 pt-4">
                 <button type="button" onclick="closeModal()" class="px-4 py-2 text-sm font-semibold text-gray-500 hover:bg-gray-50 rounded-xl cursor-pointer">Batal</button>
-                <button type="submit" id="submitBtn" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl cursor-pointer">Simpan</button>
+                <button type="submit" id="submitBtn" class="px-5 py-2 text-sm font-semibold text-white {{ $tema['btn'] }} rounded-xl cursor-pointer transition">Simpan</button>
             </div>
         </form>
     </div>
 </div>
 
-<form id="deleteForm" method="POST" style="display:none;">
+<form id="deleteForm" method="POST" class="hidden">
     @csrf
     <input type="hidden" name="_method" value="DELETE">
 </form>
@@ -135,8 +168,9 @@ const form = document.getElementById('mainForm');
 const modal = document.getElementById('modal');
 const kategori = "{{ $kategori }}";
 
-document.getElementById('fieldVolunteer').style.display = (kategori === 'Eco-Volunteer') ? 'grid' : 'none';
-document.getElementById('fieldSharing').style.display = (kategori === 'Eco-Sharing') ? 'block' : 'none';
+document.getElementById('fieldVolunteer').classList.toggle('grid', kategori === 'Eco-Volunteer');
+document.getElementById('fieldVolunteer').classList.toggle('hidden', kategori !== 'Eco-Volunteer');
+document.getElementById('fieldSharing').classList.toggle('hidden', kategori !== 'Eco-Sharing');
 
 function openModal() {
     document.getElementById('modalTitle').textContent = 'Tambah ' + kategori;
@@ -144,7 +178,8 @@ function openModal() {
     form.action = window.location.pathname + '/store';
     form.querySelector('input[name="_method"]').value = 'POST';
     form.reset();
-    modal.style.display = 'flex';
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
     document.body.style.overflow = 'hidden';
 }
 
@@ -170,12 +205,14 @@ function openModalEdit(id) {
             }
         });
 
-    modal.style.display = 'flex';
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
     document.body.style.overflow = 'hidden';
 }
 
 function closeModal() {
-    modal.style.display = 'none';
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
     document.body.style.overflow = '';
 }
 
