@@ -30,7 +30,7 @@ class AksiController extends Controller
         }
 
         if ($request->kategori == 'Eco-Sharing') {
-            $rules['link_kontak'] = 'required|string|max:255';
+            $rules['link_kontak'] = 'nullable|string|max:255';
         }
 
         $request->validate($rules);
