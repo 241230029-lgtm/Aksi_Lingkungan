@@ -9,16 +9,6 @@ use Illuminate\Support\Facades\Storage;
 
 class AdminKegiatanController extends Controller
 {
-    private function mapJenis($kategori)
-    {
-        return match($kategori) {
-            'Eco-Volunteer' => 'Volunteer',
-            'Eco-Sharing' => 'Sharing',
-            'Eco-Information' => 'Informasi',
-            default => 'Informasi',
-        };
-    }
-
     public function index(Request $request)
     {
         $kegiatan = Kegiatan::when($request->search, function ($query, $search) {
@@ -36,98 +26,102 @@ class AdminKegiatanController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'judul'            => 'required|string|max:255',
-            'kategori'         => 'required|in:Eco-Sharing,Eco-Information,Eco-Volunteer',
-            'lokasi'           => 'required|string|max:255',
-            'tanggal_kejadian' => 'nullable|date',
-            'kuota_relawan'    => 'nullable|integer|min:1',
-            'link_kontak'      => 'nullable|url',
-            'deskripsi'        => 'required|string',
-            'gambar'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'file'             => 'nullable|mimes:pdf|max:5120',
-            'status'           => 'required|in:akan_datang,terlaksana,selesai',
-        ]);
-
-        $data = $request->only([
-            'judul', 'kategori', 'lokasi', 'tanggal_kejadian',
-            'kuota_relawan', 'link_kontak', 'deskripsi', 'status'
-        ]);
-
-        $data['user_id'] = auth()->id();
-        $data['jenis'] = $this->mapJenis($data['kategori']);
-
-        if ($request->hasFile('gambar')) {
-            $data['gambar'] = $request->file('gambar')->store('kegiatan', 'public');
-        }
-
-        if ($request->hasFile('file')) {
-            $data['file'] = $request->file('file')->store('kegiatan-file', 'public');
-        }
-
-        Kegiatan::create($data);
-
-        return redirect()->route('admin.kegiatan')->with('success', 'Kegiatan berhasil ditambahkan.');
+        return $this->saveKegiatan($request);
     }
 
     public function update(Request $request, $id)
     {
-        $kegiatan = Kegiatan::findOrFail($id);
-
-        $request->validate([
-            'judul'            => 'required|string|max:255',
-            'kategori'         => 'required|in:Eco-Sharing,Eco-Information,Eco-Volunteer',
-            'lokasi'           => 'required|string|max:255',
-            'tanggal_kejadian' => 'nullable|date',
-            'kuota_relawan'    => 'nullable|integer|min:1',
-            'link_kontak'      => 'nullable|url',
-            'deskripsi'        => 'required|string',
-            'gambar'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'file'             => 'nullable|mimes:pdf|max:5120',
-            'status'           => 'required|in:akan_datang,terlaksana,selesai',
-        ]);
-
-        $data = $request->only([
-            'judul', 'kategori', 'lokasi', 'tanggal_kejadian',
-            'kuota_relawan', 'link_kontak', 'deskripsi', 'status'
-        ]);
-
-        $data['user_id'] = $kegiatan->user_id;
-        $data['jenis'] = $this->mapJenis($data['kategori']);
-
-        if ($request->hasFile('gambar')) {
-            if ($kegiatan->gambar && Storage::disk('public')->exists($kegiatan->gambar)) {
-                Storage::disk('public')->delete($kegiatan->gambar);
-            }
-            $data['gambar'] = $request->file('gambar')->store('kegiatan', 'public');
-        }
-
-        if ($request->hasFile('file')) {
-            if ($kegiatan->file && Storage::disk('public')->exists($kegiatan->file)) {
-                Storage::disk('public')->delete($kegiatan->file);
-            }
-            $data['file'] = $request->file('file')->store('kegiatan-file', 'public');
-        }
-
-        $kegiatan->update($data);
-
-        return redirect()->route('admin.kegiatan')->with('success', 'Kegiatan berhasil diperbarui.');
+        return $this->saveKegiatan($request, $id);
     }
 
     public function destroy($id)
     {
         $kegiatan = Kegiatan::findOrFail($id);
-
         if ($kegiatan->gambar && Storage::disk('public')->exists($kegiatan->gambar)) {
             Storage::disk('public')->delete($kegiatan->gambar);
         }
+        $kegiatan->delete();
+        return back()->with('success', 'Data berhasil dihapus.');
+    }
 
-        if ($kegiatan->file && Storage::disk('public')->exists($kegiatan->file)) {
-            Storage::disk('public')->delete($kegiatan->file);
+    public function indexKategori(Request $request, $kategori)
+    {
+        $query = Kegiatan::where('kategori', $kategori);
+
+        if ($request->filled('search')) {
+            $query->where('judul', 'like', '%' . $request->search . '%');
         }
 
-        $kegiatan->delete();
+        $items = $query->latest()->paginate(10)->withQueryString();
 
-        return redirect()->route('admin.kegiatan')->with('success', 'Kegiatan berhasil dihapus.');
+        return view('admin.kegiatan.kategori', compact('items', 'kategori'));
+    }
+
+public function storeKategori(Request $request)
+{
+    return $this->saveKegiatan($request, null, $request->kategori);
+}
+
+public function updateKategori(Request $request, $id)
+{
+    return $this->saveKegiatan($request, $id, $request->kategori);
+}
+    private function saveKegiatan(Request $request, $id = null, $forceKategori = null)
+    {
+        $isUpdate = $id !== null;
+        $kategori = $forceKategori ?? $request->kategori;
+
+        $rules = [
+            'judul'           => 'required|string|max:255',
+            'lokasi'          => 'required|string|max:255',
+            'deskripsi'       => 'required|string',
+            'gambar'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'status'          => 'required|in:Aktif,Selesai',
+        ];
+
+        if ($kategori === 'Eco-Volunteer') {
+            $rules['tanggal_kejadian'] = 'nullable|date';
+            $rules['kuota_relawan']   = 'nullable|integer|min:1';
+        }
+
+        if ($kategori === 'Eco-Sharing') {
+            $rules['link_kontak'] = 'required|string|max:255';
+        }
+
+        $request->validate($rules);
+
+        $data = $request->only([
+            'judul', 'lokasi', 'tanggal_kejadian',
+            'kuota_relawan', 'link_kontak', 'deskripsi', 'status'
+        ]);
+
+        $data['kategori'] = $kategori;
+        $data['user_id'] = $isUpdate ? Kegiatan::find($id)->user_id : auth()->id();
+
+        $data['jenis'] = match($kategori) {
+            'Eco-Sharing'    => 'Barang',
+            'Eco-Information' => 'Edukasi',
+            'Eco-Volunteer'  => 'Relawan',
+            default          => 'Lainnya',
+        };
+
+        if ($request->hasFile('gambar')) {
+            if ($isUpdate) {
+                $old = Kegiatan::find($id);
+                if ($old->gambar && Storage::disk('public')->exists($old->gambar)) {
+                    Storage::disk('public')->delete($old->gambar);
+                }
+            }
+            $data['gambar'] = $request->file('gambar')->store('kegiatan', 'public');
+        }
+
+        if ($isUpdate) {
+            Kegiatan::find($id)->update($data);
+            return back()->with('success', 'Data berhasil diperbarui.');
+        } else {
+            Kegiatan::create($data);
+            $routeName = 'admin.' . strtolower(str_replace('Eco-', '', $kategori));
+            return redirect()->route($routeName)->with('success', 'Data berhasil ditambahkan.');
+        }
     }
 }

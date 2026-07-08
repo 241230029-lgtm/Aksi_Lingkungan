@@ -3,44 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< HEAD
-    <title>Platform Aksi Lingkungan</title>
-
-    @vite(['resources/css/app.css','resources/js/app.js'])
-</head>
-<body>
-
-    <nav class="navbar">
-        <div class="logo">
-            🌱 EcoPlatform
-        </div>
-
-        <ul class="menu">
-            <li><a href="/">Beranda</a></li>
-            <li><a href="/sharing">Eco Sharing</a></li>
-            <li><a href="#">Kegiatan</a></li>
-            <li><a href="#">Tentang</a></li>
-        </ul>
-    </nav>
-=======
     <title>{{ config('app.name', 'Aksi Lingkungan') }}</title>
-
+    <style>body{opacity:0;transition:opacity .2s}</style>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>document.addEventListener("DOMContentLoaded",()=>{document.body.style.opacity="1"})</script>
 </head>
-
 <body class="bg-gray-50 text-gray-800">
 
     @include('layouts.partials.navbar')
->>>>>>> main
 
     <main>
         @yield('content')
     </main>
 
-<<<<<<< HEAD
-=======
     @include('layouts.partials.footer')
 
->>>>>>> main
+    @stack('scripts')
+
 </body>
 </html>
