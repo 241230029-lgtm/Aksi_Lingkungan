@@ -1,18 +1,19 @@
 @extends('layouts.app')
-
 @section('content')
-
 <section class="bg-green-600 text-white py-16">
     <div class="max-w-7xl mx-auto px-6">
         <a href="{{ route('information.index') }}" class="text-green-100 hover:text-white text-sm">&larr; Kembali ke Mading</a>
         <h1 class="text-4xl font-bold mt-4">{{ $information->judul }}</h1>
+<<<<<<< HEAD
         <p class="mt-3 text-green-100">
             ✍️ {{ $information->penulis }} &nbsp;|&nbsp; 
             📅 {{ isset($information->tanggal) ? \Carbon\Carbon::parse($information->tanggal)->format('d M Y') : $information->created_at->format('d M Y') }}
         </p>
+=======
+        <p class="mt-3 text-green-100">{{ $information->user->name ?? 'Admin' }} | {{ $information->created_at->format('d M Y') }}</p>
+>>>>>>> ba27d15 (fix: samakan controller publik Sharing/Information/Volunteer ke tabel kegiatans, perbaiki link detail ke katalog.show)
     </div>
 </section>
-
 <section class="py-16 bg-gray-100">
 <div class="max-w-4xl mx-auto px-6">
     <div class="bg-white rounded-2xl shadow overflow-hidden">
@@ -26,6 +27,7 @@
         </div>
 
         <div class="p-8">
+<<<<<<< HEAD
             <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">{{ $information->kategori }}</span>
             <div class="text-gray-700 mt-6 leading-relaxed whitespace-pre-line">{{ $information->konten }}</div>
 
@@ -42,10 +44,15 @@
                     </a>
                 </div>
             @endif
+=======
+            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">Eco-Information</span>
+            <div class="text-gray-700 mt-6 leading-relaxed whitespace-pre-line">{{ $information->deskripsi }}</div>
+>>>>>>> ba27d15 (fix: samakan controller publik Sharing/Information/Volunteer ke tabel kegiatans, perbaiki link detail ke katalog.show)
         </div>
     </div>
 </div>
 </section>
+<<<<<<< HEAD
 
 <div id="imageModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-80 flex items-center justify-center p-4" onclick="toggleModal(false)">
     <div class="relative max-w-4xl max-h-full" onclick="event.stopPropagation()">
@@ -68,4 +75,6 @@
     }
 </script>
 
+=======
+>>>>>>> ba27d15 (fix: samakan controller publik Sharing/Information/Volunteer ke tabel kegiatans, perbaiki link detail ke katalog.show)
 @endsection

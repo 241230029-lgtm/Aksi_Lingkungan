@@ -6,34 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Models\Information;
 use App\Models\Kegiatan; // 1. Di-import agar bisa konek ke menu Kegiatan
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class InformationController extends Controller
 {
-    /**
-     * PUBLIK: Menampilkan daftar artikel informasi untuk masyarakat
-     */
     public function index(Request $request)
     {
-        $query = Information::query();
-
-        if ($request->filled('search')) {
-            $query->where('judul', 'like', '%' . $request->search . '%');
-        }
-
-        $informations = $query->latest()->get();
-
-        // Mengarah ke view public sesuai dengan return asli Anda
-        return view('information.index', compact('informations')); 
+        $informations = Kegiatan::where('kategori', 'Eco-Information')->where('status', 'Aktif')->latest()->get();
+        return view('information.index', compact('informations'));
     }
 
-    /**
-     * PUBLIK: Menampilkan detail satu artikel informasi (Tugas 3: Cek Detail Gambar)
-     */
     public function show($id)
     {
-        $information = Information::findOrFail($id);
-
+        $information = Kegiatan::where('kategori', 'Eco-Information')->where('id_kegiatan', $id)->firstOrFail();
         return view('information.detail', compact('information'));
     }
 

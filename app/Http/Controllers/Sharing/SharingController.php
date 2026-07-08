@@ -3,21 +3,23 @@
 namespace App\Http\Controllers\Sharing;
 
 use App\Http\Controllers\Controller;
+<<<<<<< HEAD
 use App\Models\Sharing;
 use App\Models\Kegiatan; // 1. Di-import agar bisa konek ke menu Kegiatan
+=======
+use App\Models\Kegiatan;
+>>>>>>> ba27d15 (fix: samakan controller publik Sharing/Information/Volunteer ke tabel kegiatans, perbaiki link detail ke katalog.show)
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage; // Untuk menghapus file lama saat update/destroy jika diperlukan
 
 class SharingController extends Controller
 {
-    /**
-     * Tampilan untuk Halaman Depan/Public (Sudah ada di proyek Anda)
-     */
     public function index()
     {
-        $sharings = Sharing::latest()->get();
-        return view('sharing.index', compact('sharings')); // Sesuaikan dengan view public Anda jika ada
+        $sharings = Kegiatan::where('kategori', 'Eco-Sharing')->where('status', 'Aktif')->latest()->get();
+        return view('sharing.index', compact('sharings'));
     }
+<<<<<<< HEAD
 
     /**
      * =========================================================================
@@ -130,4 +132,6 @@ class SharingController extends Controller
 
         return redirect()->route('admin.sharing')->with('success', 'Data sharing diskusi berhasil dihapus.');
     }
+=======
+>>>>>>> ba27d15 (fix: samakan controller publik Sharing/Information/Volunteer ke tabel kegiatans, perbaiki link detail ke katalog.show)
 }

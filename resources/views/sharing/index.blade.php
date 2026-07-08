@@ -1,52 +1,11 @@
-<<<<<<< HEAD
 @extends('layouts.app')
-
 @section('content')
-
-<div class="container">
-
-    <div class="hero">
-        <h1>🌱 Eco Sharing</h1>
-        <p>Temukan berbagai kegiatan dan inspirasi menjaga lingkungan.</p>
-    </div>
-
-    <div class="search-box">
-
-        <input type="text" placeholder="Cari kegiatan...">
-
-        <select>
-            <option>Semua Kategori</option>
-            <option>Penghijauan</option>
-            <option>Daur Ulang</option>
-            <option>Bank Sampah</option>
-        </select>
-
-        <select>
-            <option>Semua Lokasi</option>
-            <option>Pontianak</option>
-            <option>Kubu Raya</option>
-            <option>Singkawang</option>
-        </select>
-
-        <button>Cari</button>
-
-    </div>
-
-</div>
-
-@endsection
-=======
-﻿@extends('layouts.app')
-
-@section('content')
-
 <section class="bg-green-600 text-white py-16">
     <div class="max-w-7xl mx-auto px-6">
         <h1 class="text-5xl font-bold">Eco-Sharing</h1>
         <p class="mt-4 text-lg text-green-100">Bagikan atau temukan barang bekas pakai untuk lingkungan lebih baik.</p>
     </div>
 </section>
-
 <section class="py-16 bg-gray-100">
 <div class="max-w-7xl mx-auto px-6">
 @if($sharings->isEmpty())
@@ -64,10 +23,10 @@
             <p class="text-gray-500 mt-3">{{ Str::limit($item->deskripsi, 100) }}</p>
             <div class="flex justify-between items-center mt-6">
                 <div>
-                    <p class="text-sm text-gray-500">📍 {{ $item->lokasi }}</p>
-                    <p class="text-sm text-gray-500">📅 {{ $item->created_at->format('d M Y') }}</p>
+                    <p class="text-sm text-gray-500">Lokasi: {{ $item->lokasi }}</p>
+                    <p class="text-sm text-gray-500">{{ $item->created_at->format('d M Y') }}</p>
                 </div>
-                <a href="{{ route('sharing.show', $item->id_kegiatan) }}" class="bg-green-600 text-white px-5 py-2 rounded-xl hover:bg-green-700">Detail</a>
+                <a href="{{ route('katalog.show', ['tipe' => 'sharing', 'id' => $item->id_kegiatan]) }}" class="bg-green-600 text-white px-5 py-2 rounded-xl hover:bg-green-700">Detail</a>
             </div>
         </div>
     </div>
@@ -76,6 +35,4 @@
 @endif
 </div>
 </section>
-
 @endsection
->>>>>>> main
