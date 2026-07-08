@@ -20,6 +20,17 @@
         </div>
     @endif
 
+    @if($errors->any())
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
+            <p class="font-bold mb-1">Data gagal disimpan, periksa kembali:</p>
+            <ul class="list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('user.aksi.store') }}" enctype="multipart/form-data">
         @csrf
 
@@ -53,6 +64,11 @@
                 <div>
                     <label class="text-sm font-semibold text-gray-700">Kuota Relawan</label>
                     <input type="number" name="kuota_relawan" min="1" placeholder="Contoh: 50" class="mt-2 w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-sm font-semibold text-gray-700">Link WhatsApp Panitia</label>
+                    <input type="text" name="link_kontak" placeholder="Contoh: https://wa.me/6281234567890" class="mt-2 w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition">
+                    <p class="text-xs text-gray-400 mt-1">Relawan yang mendaftar akan langsung diarahkan ke nomor ini.</p>
                 </div>
             </div>
         </div>
@@ -88,8 +104,14 @@
 <script>
 function toggleFormFields() {
     const kategori = document.getElementById('kategoriSelect').value;
-    document.getElementById('volunteerFields').style.display = (kategori === 'Eco-Volunteer') ? 'block' : 'none';
-    document.getElementById('sharingFields').style.display = (kategori === 'Eco-Sharing') ? 'block' : 'none';
+    const isVolunteer = (kategori === 'Eco-Volunteer');
+    const isSharing = (kategori === 'Eco-Sharing');
+
+    document.getElementById('volunteerFields').style.display = isVolunteer ? 'block' : 'none';
+    document.getElementById('sharingFields').style.display = isSharing ? 'block' : 'none';
+
+    document.querySelectorAll('#volunteerFields input').forEach(el => el.disabled = !isVolunteer);
+    document.querySelectorAll('#sharingFields input').forEach(el => el.disabled = !isSharing);
 }
 </script>
 @endpush

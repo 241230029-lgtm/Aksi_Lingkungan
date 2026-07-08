@@ -124,6 +124,10 @@
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Kuota Relawan</label>
                     <input type="number" name="kuota_relawan" id="f_kuota" min="1" class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none {{ $tema['ring'] }}">
                 </div>
+                <div class="col-span-2">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Link WhatsApp Panitia</label>
+                    <input type="text" name="link_kontak_v" id="f_link_v" placeholder="https://wa.me/..." class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none {{ $tema['ring'] }}">
+                </div>
             </div>
 
             <div id="fieldSharing" class="hidden">
@@ -183,6 +187,12 @@ function openModal() {
     document.body.style.overflow = 'hidden';
 }
 
+form.addEventListener('submit', function() {
+    if (kategori === 'Eco-Volunteer') {
+        document.getElementById('f_link_v').name = 'link_kontak';
+    }
+});
+
 function openModalEdit(id) {
     document.getElementById('modalTitle').textContent = 'Edit ' + kategori;
     document.getElementById('submitBtn').textContent = 'Simpan Perubahan';
@@ -199,6 +209,7 @@ function openModalEdit(id) {
             if(kategori === 'Eco-Volunteer') {
                 document.getElementById('f_tanggal').value = data.tanggal_kejadian || '';
                 document.getElementById('f_kuota').value = data.kuota_relawan || '';
+                document.getElementById('f_link_v').value = data.link_kontak || '';
             }
             if(kategori === 'Eco-Sharing') {
                 document.getElementById('f_link').value = data.link_kontak || '';

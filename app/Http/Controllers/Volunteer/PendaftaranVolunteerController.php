@@ -1,12 +1,10 @@
 <?php
-
 namespace App\Http\Controllers\Volunteer;
-
 use App\Http\Controllers\Controller;
+use App\Models\Kegiatan;
 use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
 class PendaftaranVolunteerController extends Controller
 {
     /**
@@ -17,21 +15,23 @@ class PendaftaranVolunteerController extends Controller
         $request->validate([
             'alasan_bergabung' => 'required|string|min:10|max:1000',
         ]);
-
         // Cek apakah user sudah pernah mendaftar
         $sudahDaftar = Pendaftaran::where('kegiatan_id', $id)
             ->where('user_id', Auth::id())
             ->exists();
-
         if ($sudahDaftar) {
             return back()->with('error', 'Kamu sudah mendaftar pada kegiatan ini.');
         }
-
         Pendaftaran::create([
             'kegiatan_id' => $id,
             'user_id' => Auth::id(),
             'alasan_bergabung' => $request->alasan_bergabung,
         ]);
+
+        $kegiatan = Kegiatan::find($id);
+        if ($kegiatan && $kegiatan->link_kontak) {
+            return redirect()->away($kegiatan->link_kontak);
+        }
 
         return back()->with(
             'success',
