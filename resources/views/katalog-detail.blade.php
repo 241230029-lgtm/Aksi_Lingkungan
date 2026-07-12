@@ -96,6 +96,15 @@
                                 <div class="mb-4 p-4 bg-red-50 text-red-700 border border-red-200 rounded-xl font-semibold text-sm">{{ session('error') }}</div>
                             @endif
 
+                        @if ($errors->any())
+                            <div class="mb-4 p-4 bg-red-50 text-red-700 border border-red-200 rounded-xl text-sm">
+                                <ul class="list-disc list-inside">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                             <form method="POST" action="{{ route('volunteer.daftar', $item->id_kegiatan) }}">
                                 @csrf
                                 <div class="mb-4">
