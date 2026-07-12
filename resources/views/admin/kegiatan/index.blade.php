@@ -29,10 +29,10 @@
 </div>
 <div class="flex items-center gap-3">
 <form action="{{ route('admin.kegiatan') }}" method="GET" class="relative">
-<input type="text" name="search" value="{{ request('search') }}" placeholder="Cari kegiatan..." class="input pl-10 w-60 shadow-sm">
-<svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+<input type="text" name="search" value="{{ request('search') }}" placeholder="Cari kegiatan..." class="border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 pl-10 pr-4 py-2 w-60 shadow-sm">
+<svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
 </form>
-<button onclick="openModal('modalKegiatan')" class="btn bg-blue-600 hover:bg-blue-700 text-white shadow-sm">+ Tambah</button>
+
 </div>
 </div>
 
@@ -69,6 +69,9 @@
 </td>
 <td class="p-4 px-6">
 <div class="flex items-center justify-center gap-2">
+<button onclick="openDetailModal({{ json_encode($item) }})" class="icon-btn bg-blue-50 hover:bg-blue-100 text-blue-700" title="Lihat Detail">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+</button>
 <button onclick="openEditModal({{ json_encode($item) }})" class="icon-btn bg-amber-50 hover:bg-amber-100 text-amber-700" title="Edit">
 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11 20H8v-3L19.586 4.353z"/></svg>
 </button>
@@ -93,7 +96,7 @@
 <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl relative">
 <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
 <h3 id="modalTitle" class="text-xl font-bold text-gray-900">Tambah Kegiatan</h3>
-<button onclick="closeModal('modalKegiatan')" class="text-gray-400 hover:text-gray-600 cursor-pointer">✕</button>
+<button onclick="closeModal('modalKegiatan')" class="text-gray-400 hover:text-gray-600 cursor-pointer">ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢</button>
 </div>
 
 <form id="kegiatanForm" action="{{ route('admin.kegiatan.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
@@ -172,12 +175,64 @@
 </div>
 </div>
 
+<div id="modalDetail" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/50 flex items-center justify-center p-4">
+<div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl relative">
+<div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
+<h3 class="text-xl font-bold text-gray-900">Detail Kegiatan</h3>
+<button onclick="closeModal('modalDetail')" class="text-gray-400 hover:text-gray-600 cursor-pointer">&times;</button>
+</div>
+<div class="space-y-3 text-sm">
+<div id="detailImgWrap" class="w-full h-40 bg-gray-50 border border-gray-200 rounded-xl overflow-hidden flex items-center justify-center">
+<img id="detailImg" src="" class="hidden w-full h-full object-cover">
+<span id="detailImgPlaceholder" class="text-gray-400 text-xs font-semibold">Belum ada gambar</span>
+</div>
+<div><span class="label">Judul</span><p id="d_judul" class="font-bold text-gray-900"></p></div>
+<div class="grid grid-cols-2 gap-4">
+<div><span class="label">Kategori</span><p id="d_kategori" class="text-gray-700"></p></div>
+<div><span class="label">Status</span><p id="d_status" class="text-gray-700"></p></div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div><span class="label">Lokasi</span><p id="d_lokasi" class="text-gray-700"></p></div>
+<div><span class="label">Tanggal</span><p id="d_tanggal" class="text-gray-700"></p></div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div><span class="label">Kuota Relawan</span><p id="d_kuota" class="text-gray-700"></p></div>
+<div><span class="label">Link WA</span><p id="d_link" class="text-gray-700 break-all"></p></div>
+</div>
+<div><span class="label">Deskripsi</span><p id="d_deskripsi" class="text-gray-700 whitespace-pre-line"></p></div>
+</div>
+<div class="pt-4 mt-4 border-t border-gray-100 flex justify-end">
+<button type="button" onclick="closeModal('modalDetail')" class="btn text-gray-500 hover:bg-gray-50">Tutup</button>
+</div>
+</div>
+</div>
 <form id="deleteForm" method="POST" class="hidden">
 @csrf
 @method('DELETE')
 </form>
 
 <script>
+function openDetailModal(data) {
+document.getElementById('d_judul').textContent = data.judul || '-';
+document.getElementById('d_kategori').textContent = data.kategori || '-';
+document.getElementById('d_status').textContent = data.status || '-';
+document.getElementById('d_lokasi').textContent = data.lokasi || '-';
+document.getElementById('d_tanggal').textContent = data.tanggal_kejadian || '-';
+document.getElementById('d_kuota').textContent = data.kuota_relawan || '-';
+document.getElementById('d_link').textContent = data.link_kontak || '-';
+document.getElementById('d_deskripsi').textContent = data.deskripsi || '-';
+
+if (data.gambar) {
+document.getElementById('detailImg').src = '{{ asset("storage/") }}/' + data.gambar;
+document.getElementById('detailImg').classList.remove('hidden');
+document.getElementById('detailImgPlaceholder').classList.add('hidden');
+} else {
+document.getElementById('detailImg').classList.add('hidden');
+document.getElementById('detailImgPlaceholder').classList.remove('hidden');
+}
+
+openModal('modalDetail');
+}
 function openModal(id) {
 document.getElementById(id).classList.remove('hidden');
 document.body.style.overflow = 'hidden';
