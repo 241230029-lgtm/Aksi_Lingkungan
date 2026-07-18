@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -17,6 +17,9 @@ use App\Http\Controllers\KatalogController;
 use App\Http\Controllers\Admin\AdminKegiatanController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUserController;
+
+// Impor Controller Profil Baru
+use App\Http\Controllers\User\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,6 +83,7 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
 
     // Manajemen User
     Route::get('/users', [AdminUserController::class, 'index'])->name('users');
+    // ... (kode manajemen user lainnya)
     Route::post('/users/store', [AdminUserController::class, 'store'])->name('users.store');
     Route::put('/users/update/{id}', [AdminUserController::class, 'update'])->name('users.update');
     Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
@@ -110,3 +114,15 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::delete('/volunteer/{id}', [AdminKegiatanController::class, 'destroy'])->name('volunteer.destroy');
 
 });
+<<<<<<< HEAD
+
+/*
+|--------------------------------------------------------------------------
+| FITUR PROFIL DINAMIS
+|--------------------------------------------------------------------------
+*/
+// Tanpa middleware ['auth'] agar serasi dengan login session buatan tim kamu
+Route::get('/volunteer/profile', [ProfileController::class, 'index'])->name('profile.index');
+Route::patch('/volunteer/profile', [ProfileController::class, 'update'])->name('profile.update');
+=======
+>>>>>>> ea2a8be11c5dd4f232a7a027cc1cb1b2b6bf701f

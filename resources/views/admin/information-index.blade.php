@@ -47,7 +47,7 @@
                             <td class="p-4 px-6">
                                 @if($item->gambar)
                                     <img src="{{ asset('storage/' . $item->gambar) }}" class="w-12 h-12 object-cover rounded-xl border border-gray-100">
-                                @else
+                                @ graves else
                                     <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-400 text-xs font-bold">No Cover</div>
                                 @endif
                             </td>
@@ -56,7 +56,9 @@
                                 <span class="bg-green-50 text-green-700 border border-green-100 px-2.5 py-0.5 rounded-md text-xs font-semibold">{{ $item->kategori }}</span>
                             </td>
                             <td class="p-4 px-6 text-gray-600">{{ $item->penulis }}</td>
-                            <td class="p-4 px-6 text-xs text-gray-400">{{ $item->created_at->translatedFormat('d M Y') }}</td>
+                            <td class="p-4 px-6 text-xs text-gray-400">
+                                {{ $item->tanggal ? \Carbon\Carbon::parse($item->tanggal)->translatedFormat('d M Y') : $item->created_at->translatedFormat('d M Y') }}
+                            </td>
                             <td class="p-4 px-6 text-center flex items-center justify-center gap-2 mt-2">
                                 <button onclick="openEditModal({{ json_encode($item) }})" class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition cursor-pointer">
                                     Edit
@@ -78,7 +80,7 @@
 </div>
 
 <div id="modalTambahInfo" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl relative">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl relative my-auto">
         <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
             <h3 class="text-xl font-bold text-gray-900">Form Tambah Artikel</h3>
             <button onclick="closeModal('modalTambahInfo')" class="text-gray-400 hover:text-gray-600 cursor-pointer">✕</button>
@@ -89,6 +91,17 @@
                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Judul Artikel</label>
                 <input type="text" name="judul" required placeholder="Masukkan judul edukasi..." class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm">
             </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Hubungkan ke Kegiatan</label>
+                <select name="kegiatan_id" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm">
+                    <option value="">-- Pilih Kegiatan --</option>
+                    @foreach($kegiatans as $kegiatan)
+                        <option value="{{ $kegiatan->id }}">{{ $kegiatan->nama_kegiatan ?? $kegiatan->nama }}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Kategori</label>
@@ -103,14 +116,27 @@
                     <input type="text" name="penulis" value="Admin" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm">
                 </div>
             </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tanggal Rilis</label>
+                <input type="date" name="tanggal" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm">
+            </div>
+
             <div>
                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Isi Konten Informasi</label>
-                <textarea name="konten" required rows="4" placeholder="Tulis isi pembahasan lengkap di sini..." class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm"></textarea>
+                <textarea name="konten" required rows="3" placeholder="Tulis isi pembahasan lengkap di sini..." class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 text-sm"></textarea>
             </div>
+            
             <div>
                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Gambar Sampul</label>
                 <input type="file" name="gambar" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-green-700">
             </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">File Dokumen Pendukung (PDF/Docx)</label>
+                <input type="file" name="file" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-green-700">
+            </div>
+
             <div class="pt-4 border-t border-gray-100 flex justify-end gap-2">
                 <button type="button" onclick="closeModal('modalTambahInfo')" class="px-4 py-2 text-sm text-gray-500 rounded-xl hover:bg-gray-50">Batal</button>
                 <button type="submit" class="px-4 py-2 text-sm text-white bg-green-600 rounded-xl font-semibold hover:bg-green-700">Terbitkan</button>
@@ -120,7 +146,7 @@
 </div>
 
 <div id="modalEditInfo" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl relative">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl relative my-auto">
         <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
             <h3 class="text-xl font-bold text-gray-900">Form Edit Artikel</h3>
             <button onclick="closeModal('modalEditInfo')" class="text-gray-400 hover:text-gray-600 cursor-pointer">✕</button>
@@ -132,6 +158,17 @@
                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Judul Artikel</label>
                 <input type="text" id="edit_judul" name="judul" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
             </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Hubungkan ke Kegiatan</label>
+                <select id="edit_kegiatan_id" name="kegiatan_id" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
+                    <option value="">-- Pilih Kegiatan --</option>
+                    @foreach($kegiatans as $kegiatan)
+                        <option value="{{ $kegiatan->id }}">{{ $kegiatan->nama_kegiatan ?? $kegiatan->nama }}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Kategori</label>
@@ -146,14 +183,27 @@
                     <input type="text" id="edit_penulis" name="penulis" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
                 </div>
             </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tanggal Rilis</label>
+                <input type="date" id="edit_tanggal" name="tanggal" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
+            </div>
+
             <div>
                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Isi Konten Informasi</label>
-                <textarea id="edit_konten" name="konten" required rows="4" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm"></textarea>
+                <textarea id="edit_konten" name="konten" required rows="3" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm"></textarea>
             </div>
+            
             <div>
                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Ganti Gambar Sampul (Opsional)</label>
                 <input type="file" name="gambar" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700">
             </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Ganti File Dokumen Lampiran (Opsional)</label>
+                <input type="file" name="file" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700">
+            </div>
+
             <div class="pt-4 border-t border-gray-100 flex justify-end gap-2">
                 <button type="button" onclick="closeModal('modalEditInfo')" class="px-4 py-2 text-sm text-gray-500 rounded-xl hover:bg-gray-50">Batal</button>
                 <button type="submit" class="px-4 py-2 text-sm text-white bg-blue-600 rounded-xl font-semibold hover:bg-blue-700">Simpan Perubahan</button>
@@ -182,6 +232,11 @@
         document.getElementById('edit_kategori').value = data.kategori;
         document.getElementById('edit_penulis').value = data.penulis;
         document.getElementById('edit_konten').value = data.konten;
+        
+        // Mengisi data lama kegiatan_id dan tanggal ke input form edit secara otomatis
+        document.getElementById('edit_kegiatan_id').value = data.kegiatan_id || '';
+        document.getElementById('edit_tanggal').value = data.tanggal || '';
+        
         openModal('modalEditInfo');
     }
     function triggerDelete(id) {

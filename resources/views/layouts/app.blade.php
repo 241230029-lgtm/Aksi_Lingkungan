@@ -18,7 +18,10 @@
 
     @include('layouts.partials.footer')
 
+<<<<<<< HEAD
+=======
     @stack('scripts')
 
+>>>>>>> ea2a8be11c5dd4f232a7a027cc1cb1b2b6bf701f
 </body>
 </html>
