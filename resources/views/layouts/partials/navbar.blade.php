@@ -48,6 +48,7 @@
                 </button>
                 @endif
 
+<<<<<<< HEAD
                 <!-- Profile (Sudah Diganti Menggunakan Tag Link <a> Agar Bisa Dipencet) -->
                 <a href="{{ route('profile.index') }}" class="flex items-center gap-3 pl-3 border-l border-gray-100 hover:opacity-85 transition group">
                     <img src="https://ui-avatars.com/api/?name={{ urlencode(session('name')) }}&background=16a34a&color=fff" class="w-10 h-10 rounded-full ring-2 ring-green-100 group-hover:scale-105 transition">
@@ -56,6 +57,16 @@
                         <p class="text-xs text-gray-400">Pengguna</p>
                     </div>
                 </a>
+=======
+                <!-- Profile -->
+                <div class="flex items-center gap-3 pl-3 border-l border-gray-100">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(session('name')) }}&background=16a34a&color=fff" class="w-10 h-10 rounded-full ring-2 ring-green-100">
+                    <div class="hidden md:block">
+                        <h3 class="font-semibold text-sm text-gray-800 leading-tight">{{ session('name') }}</h3>
+                        <p class="text-xs text-gray-400">{{ auth()->check() ? auth()->user()->name : 'Pengguna' }}</p>
+                    </div>
+                </div>
+>>>>>>> ea2a8be11c5dd4f232a7a027cc1cb1b2b6bf701f
 
                 <!-- Logout -->
                 <form action="{{ route('logout') }}" method="POST">

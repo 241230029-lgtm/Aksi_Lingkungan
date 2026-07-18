@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Information;
 
 use App\Http\Controllers\Controller;
+<<<<<<< HEAD
 use App\Models\Information;
 use App\Models\Kegiatan; // 1. Di-import agar bisa konek ke menu Kegiatan
+=======
+use App\Models\Kegiatan;
+>>>>>>> ea2a8be11c5dd4f232a7a027cc1cb1b2b6bf701f
 use Illuminate\Http\Request;
 
 class InformationController extends Controller
@@ -20,6 +24,7 @@ class InformationController extends Controller
         $information = Kegiatan::where('kategori', 'Eco-Information')->where('id_kegiatan', $id)->firstOrFail();
         return view('information.detail', compact('information'));
     }
+<<<<<<< HEAD
 
     /**
      * ADMIN: Menampilkan daftar artikel informasi di panel admin
@@ -132,4 +137,6 @@ class InformationController extends Controller
 
         return redirect()->route('admin.information')->with('success', 'Artikel informasi berhasil dihapus.');
     }
+=======
+>>>>>>> ea2a8be11c5dd4f232a7a027cc1cb1b2b6bf701f
 }
