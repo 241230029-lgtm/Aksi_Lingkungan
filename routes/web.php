@@ -114,7 +114,6 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::delete('/volunteer/{id}', [AdminKegiatanController::class, 'destroy'])->name('volunteer.destroy');
 
 });
-<<<<<<< HEAD
 
 /*
 |--------------------------------------------------------------------------
@@ -124,5 +123,3 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
 // Tanpa middleware ['auth'] agar serasi dengan login session buatan tim kamu
 Route::get('/volunteer/profile', [ProfileController::class, 'index'])->name('profile.index');
 Route::patch('/volunteer/profile', [ProfileController::class, 'update'])->name('profile.update');
-=======
->>>>>>> ea2a8be11c5dd4f232a7a027cc1cb1b2b6bf701f
