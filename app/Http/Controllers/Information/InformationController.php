@@ -3,13 +3,10 @@
 namespace App\Http\Controllers\Information;
 
 use App\Http\Controllers\Controller;
-<<<<<<< HEAD
 use App\Models\Information;
-use App\Models\Kegiatan; // 1. Di-import agar bisa konek ke menu Kegiatan
-=======
-use App\Models\Kegiatan;
->>>>>>> ea2a8be11c5dd4f232a7a027cc1cb1b2b6bf701f
+use App\Models\Kegiatan; // Di-import agar bisa konek ke menu Kegiatan
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class InformationController extends Controller
 {
@@ -24,7 +21,6 @@ class InformationController extends Controller
         $information = Kegiatan::where('kategori', 'Eco-Information')->where('id_kegiatan', $id)->firstOrFail();
         return view('information.detail', compact('information'));
     }
-<<<<<<< HEAD
 
     /**
      * ADMIN: Menampilkan daftar artikel informasi di panel admin
@@ -38,9 +34,8 @@ class InformationController extends Controller
         }
 
         $informations = $query->latest()->paginate(10);
-        $kegiatans = Kegiatan::all(); // 2. Ambil data kegiatan untuk dropdown di form admin
+        $kegiatans = Kegiatan::all(); // Ambil data kegiatan untuk dropdown di form admin
 
-        // 3. Oper $kegiatans ke view admin Anda
         return view('admin.information-index', compact('informations', 'kegiatans'));
     }
 
@@ -49,24 +44,21 @@ class InformationController extends Controller
      */
     public function store(Request $request)
     {
-        // 4. Tambahkan validasi tanggal, kegiatan_id, dan file dokumen
         $data = $request->validate([
             'judul'       => 'required|string|max:255',
             'kategori'    => 'required|string|max:100',
             'konten'      => 'required|string',
             'penulis'     => 'required|string|max:100',
-            'tanggal'     => 'required|date', // Input tanggal baru
-            'kegiatan_id' => 'required|exists:kegiatan,id', // Konek ke kegiatan
+            'tanggal'     => 'required|date',
+            'kegiatan_id' => 'required|exists:kegiatan,id',
             'gambar'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'file'        => 'nullable|mimes:pdf,doc,docx,zip,xls,xlsx|max:5048', // Input file baru
+            'file'        => 'nullable|mimes:pdf,doc,docx,zip,xls,xlsx|max:5048',
         ]);
 
-        // Proses simpan gambar
         if ($request->hasFile('gambar')) {
             $data['gambar'] = $request->file('gambar')->store('information', 'public');
         }
 
-        // 5. Logika proses simpan file dokumen baru
         if ($request->hasFile('file')) {
             $data['file'] = $request->file('file')->store('information/file', 'public');
         }
@@ -83,7 +75,6 @@ class InformationController extends Controller
     {
         $info = Information::findOrFail($id);
 
-        // Tambahkan validasi tanggal, kegiatan_id, dan file pada update
         $data = $request->validate([
             'judul'       => 'required|string|max:255',
             'kategori'    => 'required|string|max:100',
@@ -95,7 +86,6 @@ class InformationController extends Controller
             'file'        => 'nullable|mimes:pdf,doc,docx,zip,xls,xlsx|max:5048',
         ]);
 
-        // Update gambar jika ada file baru
         if ($request->hasFile('gambar')) {
             if ($info->gambar && Storage::disk('public')->exists($info->gambar)) {
                 Storage::disk('public')->delete($info->gambar);
@@ -103,7 +93,6 @@ class InformationController extends Controller
             $data['gambar'] = $request->file('gambar')->store('information', 'public');
         }
 
-        // 6. Update file dokumen jika ada file baru
         if ($request->hasFile('file')) {
             if ($info->file && Storage::disk('public')->exists($info->file)) {
                 Storage::disk('public')->delete($info->file);
@@ -123,12 +112,10 @@ class InformationController extends Controller
     {
         $info = Information::findOrFail($id);
 
-        // Hapus gambar dari storage
         if ($info->gambar && Storage::disk('public')->exists($info->gambar)) {
             Storage::disk('public')->delete($info->gambar);
         }
 
-        // 7. Hapus file dokumen dari storage saat data dihapus
         if ($info->file && Storage::disk('public')->exists($info->file)) {
             Storage::disk('public')->delete($info->file);
         }
@@ -137,6 +124,4 @@ class InformationController extends Controller
 
         return redirect()->route('admin.information')->with('success', 'Artikel informasi berhasil dihapus.');
     }
-=======
->>>>>>> ea2a8be11c5dd4f232a7a027cc1cb1b2b6bf701f
 }

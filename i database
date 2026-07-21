@@ -1,0 +1,366 @@
+[1mdiff --git a/.env.example b/.env.example[m
+[1mindex c0660ea..48d2f03 100644[m
+[1m--- a/.env.example[m
+[1m+++ b/.env.example[m
+[36m@@ -20,12 +20,12 @@[m [mLOG_STACK=single[m
+ LOG_DEPRECATIONS_CHANNEL=null[m
+ LOG_LEVEL=debug[m
+ [m
+[31m-DB_CONNECTION=sqlite[m
+[31m-# DB_HOST=127.0.0.1[m
+[31m-# DB_PORT=3306[m
+[31m-# DB_DATABASE=laravel[m
+[31m-# DB_USERNAME=root[m
+[31m-# DB_PASSWORD=[m
+[32m+[m[32mDB_CONNECTION=mysql[m
+[32m+[m[32mDB_HOST=127.0.0.1[m
+[32m+[m[32mDB_PORT=3306[m
+[32m+[m[32mDB_DATABASE=aksi_lingkungan[m
+[32m+[m[32mDB_USERNAME=root[m
+[32m+[m[32mDB_PASSWORD=[m
+ [m
+ SESSION_DRIVER=database[m
+ SESSION_LIFETIME=120[m
+[1mdiff --git a/app/Http/Controllers/Information/InformationController.php b/app/Http/Controllers/Information/InformationController.php[m
+[1mindex 4aa19d6..6046954 100644[m
+[1m--- a/app/Http/Controllers/Information/InformationController.php[m
+[1m+++ b/app/Http/Controllers/Information/InformationController.php[m
+[36m@@ -3,13 +3,10 @@[m
+ namespace App\Http\Controllers\Information;[m
+ [m
+ use App\Http\Controllers\Controller;[m
+[31m-<<<<<<< HEAD[m
+ use App\Models\Information;[m
+[31m-use App\Models\Kegiatan; // 1. Di-import agar bisa konek ke menu Kegiatan[m
+[31m-=======[m
+[31m-use App\Models\Kegiatan;[m
+[31m->>>>>>> ea2a8be11c5dd4f232a7a027cc1cb1b2b6bf701f[m
+[32m+[m[32muse App\Models\Kegiatan; // Di-import agar bisa konek ke menu Kegiatan[m
+ use Illuminate\Http\Request;[m
+[32m+[m[32muse Illuminate\Support\Facades\Storage;[m
+ [m
+ class InformationController extends Controller[m
+ {[m
+[36m@@ -24,7 +21,6 @@[m [mpublic function show($id)[m
+         $information = Kegiatan::where('kategori', 'Eco-Information')->where('id_kegiatan', $id)->firstOrFail();[m
+         return view('information.detail', compact('information'));[m
+     }[m
+[31m-<<<<<<< HEAD[m
+ [m
+     /**[m
+      * ADMIN: Menampilkan daftar artikel informasi di panel admin[m
+[36m@@ -38,9 +34,8 @@[m [mpublic function adminIndex(Request $request)[m
+         }[m
+ [m
+         $informations = $query->latest()->paginate(10);[m
+[31m-        $kegiatans = Kegiatan::all(); // 2. Ambil data kegiatan untuk dropdown di form admin[m
+[32m+[m[32m        $kegiatans = Kegiatan::all(); // Ambil data kegiatan untuk dropdown di form admin[m
+ [m
+[31m-        // 3. Oper $kegiatans ke view admin Anda[m
+         return view('admin.information-index', compact('informations', 'kegiatans'));[m
+     }[m
+ [m
+[36m@@ -49,24 +44,21 @@[m [mpublic function adminIndex(Request $request)[m
+      */[m
+     public function store(Request $request)[m
+     {[m
+[31m-        // 4. Tambahkan validasi tanggal, kegiatan_id, dan file dokumen[m
+         $data = $request->validate([[m
+             'judul'       => 'required|string|max:255',[m
+             'kategori'    => 'required|string|max:100',[m
+             'konten'      => 'required|string',[m
+             'penulis'     => 'required|string|max:100',[m
+[31m-            'tanggal'     => 'required|date', // Input tanggal baru[m
+[31m-            'kegiatan_id' => 'required|exists:kegiatan,id', // Konek ke kegiatan[m
+[32m+[m[32m            'tanggal'     => 'required|date',[m
+[32m+[m[32m            'kegiatan_id' => 'required|exists:kegiatan,id',[m
+             'gambar'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',[m
+[31m-            'file'        => 'nullable|mimes:pdf,doc,docx,zip,xls,xlsx|max:5048', // Input file baru[m
+[32m+[m[32m            'file'        => 'nullable|mimes:pdf,doc,docx,zip,xls,xlsx|max:5048',[m
+         ]);[m
+ [m
+[31m-        // Proses simpan gambar[m
+         if ($request->hasFile('gambar')) {[m
+             $data['gambar'] = $request->file('gambar')->store('information', 'public');[m
+         }[m
+ [m
+[31m-        // 5. Logika proses simpan file dokumen baru[m
+         if ($request->hasFile('file')) {[m
+             $data['file'] = $request->file('file')->store('information/file', 'public');[m
+         }[m
+[36m@@ -83,7 +75,6 @@[m [mpublic function update(Request $request, $id)[m
+     {[m
+         $info = Information::findOrFail($id);[m
+ [m
+[31m-        // Tambahkan validasi tanggal, kegiatan_id, dan file pada update[m
+         $data = $request->validate([[m
+             'judul'       => 'required|string|max:255',[m
+             'kategori'    => 'required|string|max:100',[m
+[36m@@ -95,7 +86,6 @@[m [mpublic function update(Request $request, $id)[m
+             'file'        => 'nullable|mimes:pdf,doc,docx,zip,xls,xlsx|max:5048',[m
+         ]);[m
+ [m
+[31m-        // Update gambar jika ada file baru[m
+         if ($request->hasFile('gambar')) {[m
+             if ($info->gambar && Storage::disk('public')->exists($info->gambar)) {[m
+                 Storage::disk('public')->delete($info->gambar);[m
+[36m@@ -103,7 +93,6 @@[m [mpublic function update(Request $request, $id)[m
+             $data['gambar'] = $request->file('gambar')->store('information', 'public');[m
+         }[m
+ [m
+[31m-        // 6. Update file dokumen jika ada file baru[m
+         if ($request->hasFile('file')) {[m
+             if ($info->file && Storage::disk('public')->exists($info->file)) {[m
+                 Storage::disk('public')->delete($info->file);[m
+[36m@@ -123,12 +112,10 @@[m [mpublic function destroy($id)[m
+     {[m
+         $info = Information::findOrFail($id);[m
+ [m
+[31m-        // Hapus gambar dari storage[m
+         if ($info->gambar && Storage::disk('public')->exists($info->gambar)) {[m
+             Storage::disk('public')->delete($info->gambar);[m
+         }[m
+ [m
+[31m-        // 7. Hapus file dokumen dari storage saat data dihapus[m
+         if ($info->file && Storage::disk('public')->exists($info->file)) {[m
+             Storage::disk('public')->delete($info->file);[m
+         }[m
+[36m@@ -137,6 +124,4 @@[m [mpublic function destroy($id)[m
+ [m
+         return redirect()->route('admin.information')->with('success', 'Artikel informasi berhasil dihapus.');[m
+     }[m
+[31m-=======[m
+[31m->>>>>>> ea2a8be11c5dd4f232a7a027cc1cb1b2b6bf701f[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/app/Http/Controllers/Sharing/SharingController.php b/app/Http/Controllers/Sharing/SharingController.php[m
+[1mindex 67dd2bf..6100e50 100644[m
+[1m--- a/app/Http/Controllers/Sharing/SharingController.php[m
+[1m+++ b/app/Http/Controllers/Sharing/SharingController.php[m
+[36m@@ -3,16 +3,8 @@[m
+ namespace App\Http\Controllers\Sharing;[m
+ [m
+ use App\Http\Controllers\Controller;[m
+[31m-<<<<<<< HEAD[m
+[31m-<<<<<<< HEAD[m
+ use App\Models\Sharing;[m
+[31m-use App\Models\Kegiatan; // 1. Di-import agar bisa konek ke menu Kegiatan[m
+[31m-=======[m
+[31m-use App\Models\Kegiatan;[m
+[31m->>>>>>> ba27d15 (fix: samakan controller publik Sharing/Information/Volunteer ke tabel kegiatans, perbaiki link detail ke katalog.show)[m
+[31m-=======[m
+[31m-use App\Models\Kegiatan;[m
+[31m->>>>>>> ea2a8be11c5dd4f232a7a027cc1cb1b2b6bf701f[m
+[32m+[m[32muse App\Models\Kegiatan; // Di-import agar bisa konek ke menu Kegiatan[m
+ use Illuminate\Http\Request;[m
+ use Illuminate\Support\Facades\Storage; // Untuk menghapus file lama saat update/destroy jika diperlukan[m
+ [m
+[36m@@ -23,8 +15,6 @@[m [mpublic function index()[m
+         $sharings = Kegiatan::where('kategori', 'Eco-Sharing')->where('status', 'Aktif')->latest()->get();[m
+         return view('sharing.index', compact('sharings'));[m
+     }[m
+[31m-<<<<<<< HEAD[m
+[31m-<<<<<<< HEAD[m
+ [m
+     /**[m
+      * =========================================================================[m
+[36m@@ -40,9 +30,8 @@[m [mpublic function adminIndex(Request $request)[m
+         }[m
+ [m
+         $sharings = $query->latest()->paginate(10);[m
+[31m-        $kegiatans = Kegiatan::all(); // 2. Ambil semua data kegiatan untuk dropdown form tambah[m
+[32m+[m[32m        $kegiatans = Kegiatan::all(); // Ambil semua data kegiatan untuk dropdown form tambah[m
+ [m
+[31m-        // 3. Oper data sharings dan kegiatans ke view admin[m
+         return view('admin.sharing-index', compact('sharings', 'kegiatans'));[m
+     }[m
+ [m
+[36m@@ -51,24 +40,21 @@[m [mpublic function adminIndex(Request $request)[m
+      */[m
+     public function adminStore(Request $request)[m
+     {[m
+[31m-        // 4. Tambahkan validasi untuk inputan baru: kegiatan_id, tanggal, gambar, dan file[m
+         $data = $request->validate([[m
+             'judul'       => 'required|string|max:255',[m
+             'kategori'    => 'required|string|max:100',[m
+             'deskripsi'   => 'required|string',[m
+             'pembuat'     => 'required|string|max:100',[m
+[31m-            'tanggal'     => 'required|date', // Sesuai kolom database kamu[m
+[31m-            'kegiatan_id' => 'required|exists:kegiatan,id', // Validasi koneksi ke tabel kegiatan[m
+[31m-            'gambar'      => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048', // Maksimal 2MB[m
+[31m-            'file'        => 'nullable|mimes:pdf,doc,docx,zip,xls,xlsx|max:5048', // Maksimal 5MB[m
+[32m+[m[32m            'tanggal'     => 'required|date',[m
+[32m+[m[32m            'kegiatan_id' => 'required|exists:kegiatan,id',[m
+[32m+[m[32m            'gambar'      => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',[m
+[32m+[m[32m            'file'        => 'nullable|mimes:pdf,doc,docx,zip,xls,xlsx|max:5048',[m
+         ]);[m
+ [m
+[31m-        // 5. Logika upload File Gambar (Sama seperti Volunteer)[m
+         if ($request->hasFile('gambar')) {[m
+             $data['gambar'] = $request->file('gambar')->store('sharing/gambar', 'public');[m
+         }[m
+ [m
+[31m-        // 6. Logika upload File Dokumen[m
+         if ($request->hasFile('file')) {[m
+             $data['file'] = $request->file('file')->store('sharing/file', 'public');[m
+         }[m
+[36m@@ -85,7 +71,6 @@[m [mpublic function adminUpdate(Request $request, $id)[m
+     {[m
+         $sharing = Sharing::findOrFail($id);[m
+ [m
+[31m-        // Validasi data update termasuk rute baru[m
+         $data = $request->validate([[m
+             'judul'       => 'required|string|max:255',[m
+             'kategori'    => 'required|string|max:100',[m
+[36m@@ -97,18 +82,16 @@[m [mpublic function adminUpdate(Request $request, $id)[m
+             'file'        => 'nullable|mimes:pdf,doc,docx,zip,xls,xlsx|max:5048',[m
+         ]);[m
+ [m
+[31m-        // Proses update gambar baru jika ada yang di-upload[m
+         if ($request->hasFile('gambar')) {[m
+             if ($sharing->gambar) {[m
+[31m-                Storage::disk('public')->delete($sharing->gambar); // Hapus gambar lama[m
+[32m+[m[32m                Storage::disk('public')->delete($sharing->gambar);[m
+             }[m
+             $data['gambar'] = $request->file('gambar')->store('sharing/gambar', 'public');[m
+         }[m
+ [m
+[31m-        // Proses update file dokumen baru jika ada yang di-upload[m
+         if ($request->hasFile('file')) {[m
+             if ($sharing->file) {[m
+[31m-                Storage::disk('public')->delete($sharing->file); // Hapus file lama[m
+[32m+[m[32m                Storage::disk('public')->delete($sharing->file);[m
+             }[m
+             $data['file'] = $request->file('file')->store('sharing/file', 'public');[m
+         }[m
+[36m@@ -124,8 +107,7 @@[m [mpublic function adminUpdate(Request $request, $id)[m
+     public function adminDestroy($id)[m
+     {[m
+         $sharing = Sharing::findOrFail($id);[m
+[31m-        [m
+[31m-        // Hapus file fisik dari storage saat data di-delete agar tidak menumpuk sampah[m
+[32m+[m
+         if ($sharing->gambar) {[m
+             Storage::disk('public')->delete($sharing->gambar);[m
+         }[m
+[36m@@ -137,8 +119,4 @@[m [mpublic function adminDestroy($id)[m
+ [m
+         return redirect()->route('admin.sharing')->with('success', 'Data sharing diskusi berhasil dihapus.');[m
+     }[m
+[31m-=======[m
+[31m->>>>>>> ba27d15 (fix: samakan controller publik Sharing/Information/Volunteer ke tabel kegiatans, perbaiki link detail ke katalog.show)[m
+[31m-=======[m
+[31m->>>>>>> ea2a8be11c5dd4f232a7a027cc1cb1b2b6bf701f[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/database/migrations/2026_07_07_142234_alter_status_and_add_file_to_kegiatans_table.php b/database/migrations/2026_07_07_142234_alter_status_and_add_file_to_kegiatans_table.php[m
+[1mindex 0ac58a3..080a5c9 100644[m
+[1m--- a/database/migrations/2026_07_07_142234_alter_status_and_add_file_to_kegiatans_table.php[m
+[1m+++ b/database/migrations/2026_07_07_142234_alter_status_and_add_file_to_kegiatans_table.php[m
+[36m@@ -8,30 +8,48 @@[m
+ {[m
+     public function up(): void[m
+     {[m
+[31m-        // 1. Perluas enum dulu supaya nilai lama & baru bisa hidup berdampingan sementara[m
+[31m-        DB::statement("ALTER TABLE kegiatans MODIFY COLUMN status ENUM('aktif', 'selesai', 'akan_datang', 'terlaksana') NOT NULL DEFAULT 'aktif'");[m
+[32m+[m[32m        $driver = Schema::getConnection()->getDriverName();[m
+[32m+[m
+[32m+[m[32m        if ($driver === 'mysql') {[m
+[32m+[m[32m            // 1. Perluas enum dulu supaya nilai lama & baru bisa hidup berdampingan sementara[m
+[32m+[m[32m            DB::statement("ALTER TABLE kegiatans MODIFY COLUMN status ENUM('aktif', 'selesai', 'akan_datang', 'terlaksana') NOT NULL DEFAULT 'aktif'");[m
+[32m+[m[32m        }[m
+ [m
+         // 2. Migrasikan data lama: 'aktif' -> 'akan_datang'[m
+         DB::table('kegiatans')->where('status', 'aktif')->update(['status' => 'akan_datang']);[m
+ [m
+[31m-        // 3. Baru persempit enum ke daftar final[m
+[31m-        DB::statement("ALTER TABLE kegiatans MODIFY COLUMN status ENUM('akan_datang', 'terlaksana', 'selesai') NOT NULL DEFAULT 'akan_datang'");[m
+[32m+[m[32m        if ($driver === 'mysql') {[m
+[32m+[m[32m            // 3. Baru persempit enum ke daftar final[m
+[32m+[m[32m            DB::statement("ALTER TABLE kegiatans MODIFY COLUMN status ENUM('akan_datang', 'terlaksana', 'selesai') NOT NULL DEFAULT 'akan_datang'");[m
+[32m+[m[32m        }[m
+ [m
+         // 4. Tambah kolom file dokumen (opsional, di samping kolom gambar yang sudah ada)[m
+[31m-        Schema::table('kegiatans', function ($table) {[m
+[31m-            $table->string('file')->nullable()->after('gambar');[m
+[31m-        });[m
+[32m+[m[32m        if (!Schema::hasColumn('kegiatans', 'file')) {[m
+[32m+[m[32m            Schema::table('kegiatans', function ($table) {[m
+[32m+[m[32m                $table->string('file')->nullable()->after('gambar');[m
+[32m+[m[32m            });[m
+[32m+[m[32m        }[m
+     }[m
+ [m
+     public function down(): void[m
+     {[m
+[31m-        Schema::table('kegiatans', function ($table) {[m
+[31m-            $table->dropColumn('file');[m
+[31m-        });[m
+[32m+[m[32m        $driver = Schema::getConnection()->getDriverName();[m
+[32m+[m
+[32m+[m[32m        if (Schema::hasColumn('kegiatans', 'file')) {[m
+[32m+[m[32m            Schema::table('kegiatans', function ($table) {[m
+[32m+[m[32m                $table->dropColumn('file');[m
+[32m+[m[32m            });[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        if ($driver === 'mysql') {[m
+[32m+[m[32m            DB::statement("ALTER TABLE kegiatans MODIFY COLUMN status ENUM('aktif', 'selesai', 'akan_datang', 'terlaksana') NOT NULL DEFAULT 'aktif'");[m
+[32m+[m[32m        }[m
+ [m
+[31m-        DB::statement("ALTER TABLE kegiatans MODIFY COLUMN status ENUM('aktif', 'selesai', 'akan_datang', 'terlaksana') NOT NULL DEFAULT 'aktif'");[m
+         DB::table('kegiatans')->where('status', 'akan_datang')->update(['status' => 'aktif']);[m
+         DB::table('kegiatans')->where('status', 'terlaksana')->update(['status' => 'aktif']);[m
+[31m-        DB::statement("ALTER TABLE kegiatans MODIFY COLUMN status ENUM('aktif', 'selesai') NOT NULL DEFAULT 'aktif'");[m
+[32m+[m
+[32m+[m[32m        if ($driver === 'mysql') {[m
+[32m+[m[32m            DB::statement("ALTER TABLE kegiatans MODIFY COLUMN status ENUM('aktif', 'selesai') NOT NULL DEFAULT 'aktif'");[m
+[32m+[m[32m        }[m
+     }[m
+ };[m
+\ No newline at end of file[m
+[1mdiff --git a/database/migrations/2026_07_07_152806_change_kategori_to_string_in_kegiatans_table.php b/database/migrations/2026_07_07_152806_change_kategori_to_string_in_kegiatans_table.php[m
+[1mindex 0e1646f..7657d26 100644[m
+[1m--- a/database/migrations/2026_07_07_152806_change_kategori_to_string_in_kegiatans_table.php[m
+[1m+++ b/database/migrations/2026_07_07_152806_change_kategori_to_string_in_kegiatans_table.php[m
+[36m@@ -2,16 +2,23 @@[m
+ [m
+ use Illuminate\Database\Migrations\Migration;[m
+ use Illuminate\Support\Facades\DB;[m
+[32m+[m[32muse Illuminate\Support\Facades\Schema;[m
+ [m
+ return new class extends Migration[m
+ {[m
+     public function up(): void[m
+     {[m
+[31m-        DB::statement("ALTER TABLE kegiatans MODIFY COLUMN kategori VARCHAR(255) NOT NULL");[m
+[32m+[m[32m        if (Schema::getConnection()->getDriverName() === 'mysql') {[m
+[32m+[m[32m            DB::statement("ALTER TABLE kegiatans MODIFY COLUMN kategori VARCHAR(255) NOT NULL");[m
+[32m+[m[32m        }[m
+[32m+[m[32m        // SQLite tidak punya tipe ENUM sungguhan (kolom disimpan sebagai teks tanpa[m
+[32m+[m[32m        // constraint), jadi kolom kategori sudah otomatis berperilaku seperti string.[m
+     }[m
+ [m
+     public function down(): void[m
+     {[m
+[31m-        DB::statement("ALTER TABLE kegiatans MODIFY COLUMN kategori ENUM('Eco-Sharing', 'Eco-Information', 'Eco-Volunteer') NOT NULL");[m
+[32m+[m[32m        if (Schema::getConnection()->getDriverName() === 'mysql') {[m
+[32m+[m[32m            DB::statement("ALTER TABLE kegiatans MODIFY COLUMN kategori ENUM('Eco-Sharing', 'Eco-Information', 'Eco-Volunteer') NOT NULL");[m
+[32m+[m[32m        }[m
+     }[m
+ };[m
+\ No newline at end of file[m
+[1mdiff --git a/package-lock.json b/package-lock.json[m
+[1mindex 41f8d6a..7eab9c4 100644[m
+[1m--- a/package-lock.json[m
+[1m+++ b/package-lock.json[m
+[36m@@ -1,9 +1,5 @@[m
+ {[m
+[31m-<<<<<<< HEAD[m
+[31m-    "name": "UAS Pak Arka",[m
+[31m-=======[m
+     "name": "Aksi_Lingkungan",[m
+[31m->>>>>>> 19b84cdf97bb792ec637ae63f2aa665fed7f67e8[m
+     "lockfileVersion": 3,[m
+     "requires": true,[m
+     "packages": {[m
