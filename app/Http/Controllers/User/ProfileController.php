@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -28,6 +29,7 @@ class ProfileController extends Controller
             'phone' => 'nullable|string|max:15',
             'alamat' => 'nullable|string|max:500',
             'password' => 'nullable|string|min:8|confirmed',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         // Simpan perubahan ke database
@@ -39,6 +41,18 @@ class ProfileController extends Controller
         // Jika user mengisi password baru, enkripsi dan simpan
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
+        }
+
+        // Jika user upload foto baru
+        if ($request->hasFile('photo')) {
+            // Hapus foto lama dari storage kalau ada, biar tidak numpuk file
+            if ($user->photo) {
+                Storage::disk('public')->delete($user->photo);
+            }
+
+            // Simpan foto baru ke storage/app/public/profile-photos
+            $path = $request->file('photo')->store('profile-photos', 'public');
+            $user->photo = $path;
         }
 
         $user->save();

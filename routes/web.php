@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -35,7 +35,7 @@ Route::view('/tentang', 'about')->name('tentang');
 Route::get('/buat-aksi', [AksiController::class, 'create'])->name('buat-aksi');
 Route::post('/buat-aksi', [AksiController::class, 'store'])->name('user.aksi.store');
 
-Route::view('/profil', 'profile')->name('profil');
+Route::get('/profil', [ProfileController::class, 'index'])->name('profil');
 Route::view('/profil/aktivitas', 'user.aktivitas')->name('aktivitas');
 Route::view('/profil/relawan', 'user.relawan')->name('relawan');
 Route::view('/profil/pengaturan', 'user.pengaturan')->name('pengaturan');

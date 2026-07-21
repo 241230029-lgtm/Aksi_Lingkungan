@@ -7,6 +7,18 @@
     <title>{{ config('app.name', 'Aksi Lingkungan') }}</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@8.0.4/dist/turbo.es2017-umd.min.js"></script>
+
+    <style>
+        body { opacity: 0; }
+        body.page-ready { opacity: 1; animation: pageFadeIn .3s ease forwards; }
+        @keyframes pageFadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
+    </style>
+    <script>
+        document.addEventListener('turbo:load', () => {
+            document.body.classList.add('page-ready');
+        });
+    </script>
 </head>
 
 <body class="bg-gray-50 text-gray-800">
@@ -39,7 +51,6 @@
             modal.classList.add('hidden');
         }
 
-        // Tambahkan fungsi Register Modal agar tidak error
         function openRegisterModal() {
             const modal = document.getElementById('registerModal');
             if(modal) {
