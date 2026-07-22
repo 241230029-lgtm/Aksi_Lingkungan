@@ -7,7 +7,7 @@
     <!-- Modal -->
     <div
         onclick="event.stopPropagation()"
-        class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
+        class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative -mt-20">
 
         <!-- Tombol Close -->
         <button

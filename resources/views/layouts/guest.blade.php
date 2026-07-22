@@ -12,7 +12,7 @@
     <style>
         body { opacity: 0; }
         body.page-ready { opacity: 1; animation: pageFadeIn .3s ease forwards; }
-        @keyframes pageFadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
+        @keyframes pageFadeIn { from { opacity:0; } to { opacity:1; } }
     </style>
     <script>
         document.addEventListener('turbo:load', () => {
